@@ -2,7 +2,9 @@
 
 Group Name is:  Dothraki
 
-## APIs to use
+## Technologies used
+* NodeJS
+* ExpressJS
 * Twilio
 * weather-js
 * handlebars
