@@ -22,6 +22,12 @@ var API = {
       type: "GET"
     });
   },
+  getWeather: function() {
+    return $.ajax({
+      url: "api/getWeather",
+      type: "GET"
+    });
+  },
   deleteExample: function(id) {
     return $.ajax({
       url: "api/examples/" + id,
@@ -29,6 +35,10 @@ var API = {
     });
   }
 };
+
+API.getWeather().then(function(data) {
+  console.log("hitting the api/getExamples to start a background interval");
+});
 
 // refreshExamples gets new examples from the db and repopulates the list
 var refreshExamples = function() {
