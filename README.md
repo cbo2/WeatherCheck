@@ -6,7 +6,7 @@ Group Name is:  Dothraki
 * NodeJS
 * ExpressJS
 * Twilio
-* weather-js
+* dark-sky
 * handlebars
 * Sequelize
 
