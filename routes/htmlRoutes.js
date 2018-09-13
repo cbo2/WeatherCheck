@@ -12,7 +12,7 @@ module.exports = function(app) {
     });
   });
 
-  console.log("hello worlddd");
+  console.log("hhhhello worlddd");
 
   // Load example page and pass in an example by id
   app.get("/example/:id", function(req, res) {
