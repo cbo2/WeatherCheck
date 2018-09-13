@@ -7,7 +7,7 @@ Group Name is:  Dothraki
 * ExpressJS
 * Twilio  (API used for sending SMS texting)
 * dark-sky  (API used for supplying current and historical weather data)
-* node-schedule  (API used to schedule background tasks at specified times)
+* node-schedule  (API used to schedule background tasks at specified times - like cron)
 * handlebars
 * Sequelize
 
