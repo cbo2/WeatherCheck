@@ -11,3 +11,5 @@ Group Name is:  Dothraki
 * handlebars
 * Sequelize
 
+to run with overrides:
+NODE_ENV=development DB_PASSWORD=mypassword node server.js
