@@ -1,14 +1,14 @@
 {
   "development": {
     "username": "root",
-    "password": "password",
+    "password": null,
     "database": "weatherdb",
     "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": "trilogy",
+    "password": null,
     "database": "testdb",
     "host": "localhost",
     "dialect": "mysql",
