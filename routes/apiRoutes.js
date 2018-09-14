@@ -16,13 +16,13 @@ setInterval(() => {
 db.UserProfile.create({
   username: "cbo",
   timePreference: JSON.stringify({
-    Sunday: moment.utc("08:00", "HH:mm").format("HH:mm"),
-    Monday: moment.utc("06:30", "HH:mm").format("HH:mm"),
-    Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),
-    Wednesday: moment.utc("06:30", "HH:mm").format("HH:mm"),
-    Thursday: moment.utc("06:30", "HH:mm").format("HH:mm"),
-    Friday: moment.utc("06:30", "HH:mm").format("HH:mm"),
-    Saturday: moment.utc("09:30", "HH:mm").format("HH:mm")
+    Sunday: "08:00",   // give the time as a simple string
+    Monday: "06:30",
+    Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Wednesday: "06:30",
+    Thursday: "06:30",
+    Friday: "06:30",
+    Saturday: "09:30"
   })
 })
 .then((returnedFromSequelize) => {
@@ -32,7 +32,7 @@ db.UserProfile.create({
 .then((priorInsertResponse) => {
   db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
   .then((queryUser) => {
-    console.log("++++ User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+    console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
   })
 })
 }, 5000);  // we run the entire interval function 5 seconds after startup
