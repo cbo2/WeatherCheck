@@ -2,7 +2,7 @@
 var $exampleText = $("#example-text");
 var $exampleDescription = $("#example-description");
 var $submitBtn = $("#submit");
-var $exampleList = $("#example-list");
+var $weatherList = $("#weatherdata-list");
 
 // The API object contains methods for each kind of request we'll make
 var API = {
@@ -16,7 +16,7 @@ var API = {
       data: JSON.stringify(example)
     });
   },
-  getExamples: function() {
+  getWeather: function() {
     return $.ajax({
       url: "api/examples",
       type: "GET"
@@ -42,16 +42,16 @@ API.getWeather().then(function(data) {
 
 // refreshExamples gets new examples from the db and repopulates the list
 var refreshExamples = function() {
-  API.getExamples().then(function(data) {
-    var $examples = data.map(function(example) {
+  API.getWeather().then(function(data) {
+    var $examples = data.map(function(weather) {
       var $a = $("<a>")
-        .text(example.text)
-        .attr("href", "/example/" + example.id);
+        .text(weather.text)
+        .attr("href", "/weather/" + weather.id);
 
       var $li = $("<li>")
         .attr({
           class: "list-group-item",
-          "data-id": example.id
+          "data-id": weather.id
         })
         .append($a);
 
@@ -64,8 +64,8 @@ var refreshExamples = function() {
       return $li;
     });
 
-    $exampleList.empty();
-    $exampleList.append($examples);
+    $weatherList.empty();
+    $weatherList.append($examples);
   });
 };
 
@@ -106,4 +106,4 @@ var handleDeleteBtnClick = function() {
 
 // Add event listeners to the submit and delete buttons
 $submitBtn.on("click", handleFormSubmit);
-$exampleList.on("click", ".delete", handleDeleteBtnClick);
+$weatherList.on("click", ".delete", handleDeleteBtnClick);

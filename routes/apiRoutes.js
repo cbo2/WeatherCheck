@@ -17,14 +17,29 @@ const darksky = new DarkSky("93d657f3bdf48bc91d9977b8e970f9dc")
 darksky
     .latitude('41.8703')            // required: latitude, string || float.
     .longitude('-87.6236')            // required: longitude, string || float.
-    .time(moment().subtract(0, 'days'))             // optional: date, string 'YYYY-MM-DD'.
+    .time(moment().subtract(1, 'days'))             // optional: date, string 'YYYY-MM-DD'.
     .units('us')                    // optional: units, string, refer to API documentation.
     .language('en')                 // optional: language, string, refer to API documentation.
     .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
     .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
     .get()                          // execute your get request.
-    .then((response) => {console.log(JSON.stringify(response));})
+    .then((response) => {console.log(JSON.stringify(response));
+      return response;
+    })
+    .then((response) => {console.log("===> " + response.daily.data[0].humidity);return response;})
+    .then((response) => {
+      db.WeatherData.create({
+        text: moment().subtract(1, 'days').toString(),
+        description: response.daily.data[0].summary
+      })
+      .then(() => {
+        console.log("== inserted row with date: " + moment().subtract(1, 'days'));
+      });
+    })
     .catch(console.log);
+
+
+    
 
 
     // app.use('/a-week-ago', async (req, res, next) => {
