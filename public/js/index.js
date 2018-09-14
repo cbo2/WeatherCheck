@@ -36,9 +36,9 @@ var API = {
   }
 };
 
-API.getWeather().then(function(data) {
-  console.log("hitting the api/getExamples to start a background interval");
-});
+// API.getWeather().then(function(data) {
+//   console.log("hitting the api/getExamples to start a background interval");
+// });
 
 // refreshExamples gets new examples from the db and repopulates the list
 var refreshExamples = function() {

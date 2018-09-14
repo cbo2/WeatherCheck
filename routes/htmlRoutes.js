@@ -15,10 +15,10 @@ module.exports = function(app) {
   console.log("hhhhello worlddd");
 
   // Load example page and pass in an example by id
-  app.get("/example/:id", function(req, res) {
-    db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
-      res.render("example", {
-        example: dbExample
+  app.get("/weatherdata/:id", function(req, res) {
+    db.WeatherData.findOne({ where: { id: req.params.id } }).then(function(weatherData) {
+      res.render("weather", {
+        weather: weatherData
       });
     });
   });

@@ -10,6 +10,34 @@ var j = schedule.scheduleJob('03 * * * *', function(){
   console.log('this runs only on the 3rd minute of each hour!!!');
 });
 
+
+setInterval(() => {
+// prototype adding a user to the system
+db.UserProfile.create({
+  username: "cbo",
+  timePreference: JSON.stringify({
+    Sunday: moment.utc("08:00", "HH:mm").format("HH:mm"),
+    Monday: moment.utc("06:30", "HH:mm").format("HH:mm"),
+    Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),
+    Wednesday: moment.utc("06:30", "HH:mm").format("HH:mm"),
+    Thursday: moment.utc("06:30", "HH:mm").format("HH:mm"),
+    Friday: moment.utc("06:30", "HH:mm").format("HH:mm"),
+    Saturday: moment.utc("09:30", "HH:mm").format("HH:mm")
+  })
+})
+.then((returnedFromSequelize) => {
+  console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+  return returnedFromSequelize;
+})
+.then((priorInsertResponse) => {
+  db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+  .then((queryUser) => {
+    console.log("++++ User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+  })
+})
+}, 5000);  // we run the entire interval function 5 seconds after startup
+
+
 const DarkSky = require('dark-sky')
 // const darksky = new DarkSky(process.env.DARK_SKY)
 const darksky = new DarkSky("93d657f3bdf48bc91d9977b8e970f9dc")
@@ -94,7 +122,7 @@ module.exports = function (app) {
   function checkWeatherInterval() {
     console.log("Checking the weather now....." + moment().format());
   }
-  setInterval(checkWeatherInterval, 5000);
+  setInterval(checkWeatherInterval, 300000);  // 5 minutes
 
   app.get("/api/getWeather", function (req, res) {
     console.log("hit the get route /api/getWeather with body: " + req.body);
