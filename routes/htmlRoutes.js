@@ -1,5 +1,6 @@
 var db = require("../models");
 
+
 module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
@@ -10,6 +11,8 @@ module.exports = function(app) {
       });
     });
   });
+
+  console.log("hhhhello worlddd");
 
   // Load example page and pass in an example by id
   app.get("/example/:id", function(req, res) {
