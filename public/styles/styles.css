@@ -1,3 +1,13 @@
-.list-group-item {
-  line-height: 2.5;
+body {
+  background-image: url(http://i1076.photobucket.com/albums/w450/kelzzxo/clouds_zpsoobcqqg0.jpg);
+  /* font-family: 'Merriweather Sans', sans-serif; */
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#pgTitle {
+  font-family: 'Alegreya', serif;
+  align-content: center;
 }
