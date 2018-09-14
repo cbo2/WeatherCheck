@@ -5,14 +5,14 @@ module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
     db.Example.findAll({}).then(function(dbExamples) {
-      res.render("indexx", {
+      res.render("index", {
         msg: "Welcome!",
         examples: dbExamples
       });
     });
   });
 
-  console.log("hhhhello world");
+  console.log("hhhhello worlddd");
 
   // Load example page and pass in an example by id
   app.get("/example/:id", function(req, res) {
