@@ -1,4 +1,4 @@
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   var UserProfile = sequelize.define("UserProfile", {
     username: {
       type: DataTypes.STRING,
@@ -12,56 +12,22 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+<<<<<<< HEAD
     phone: {
       type: DataTypes.STRING,
+=======
+    phoneNumber: {
+      type: DataTypes.DECIMAL(11),
+>>>>>>> 8c1335eb63e9b01223b47366d5519191f07eb682
       allowNull: false
     },
     zipcode: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    timesunday: {
-      type: DataTypes.STRING
-      // DATEONLY
-
-    },
-    timesunday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timesunday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timesunday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timemonday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timetuesday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timewednesday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timethursday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timefriday: {
-      type: DataTypes.STRING
-      // DATEONLY
-    },
-    timesaturday: {
-      type: DataTypes.STRING
-      // DATEONLY
+    timePreference: {
+      type: DataTypes.JSON
     }
   });
   return UserProfile;
 };
-
