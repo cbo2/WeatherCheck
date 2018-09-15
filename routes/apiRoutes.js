@@ -23,7 +23,20 @@ darksky
     .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
     .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
     .get()                          // execute your get request.
-    .then((response) => {console.log(JSON.stringify(response))})
+    .then((response) => {//console.log(JSON.stringify(response)), 
+      console.log(
+              "\n" + '---------------------------' +
+              "\n" + "This is today's forecast!" +
+              "\n" + "Today's high: " + response.daily.data[0].temperatureHigh + 
+              "\n" + "Today's low: " + response.daily.data[0].temperatureLow +
+              "\n" + "Chance of precipitation: " + response.daily.data[0].precipProbability +
+              "\n" + "Hourly temp: " + response.hourly.data[moment().format("H")].temperature +
+              "\n" + "Hourly sensation: " + response.hourly.data[moment().format("H")].apparentTemperature +
+              "\n" + "Hourly humidity: " + response.hourly.data[moment().format("H")].humidity +
+              "\n" + "Hourly wind speed: " + response.hourly.data[moment().format("H")].windSpeed + 
+              "\n" + "Hourly chance of rain: " + response.hourly.data[moment().format("H")].precipProbability
+            )
+    })
     .catch(console.log);
 
 
