@@ -5,17 +5,28 @@ var moment = require('moment');
 moment().format();
 
 var schedule = require('node-schedule');
- 
-var j = schedule.scheduleJob('03 * * * *', function(){
+
+var j = schedule.scheduleJob('03 * * * *', function () {
   console.log('this runs only on the 3rd minute of each hour!!!');
 });
 
+// this next scheduled task we be the once-per-day midnight workhorse 
+// check this link for scheduling examples:  https://crontab.guru/every-night-at-midnight
+var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
+  console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
+  db.UserProfile.findAll({}).then((users) => {
+    // console.log(JSON.stringify(users));
+    users.map((user) => { console.log(user.username); });
+  })
+  .catch(console.log);
+});
 
-setInterval(() => {
+// setInterval(() => {
 // prototype adding a user to the system
 db.UserProfile.create({
   username: "cbo",
-  timePreference: JSON.stringify({
+  // timePreference: JSON.stringify({
+  timePreference: {
     Sunday: "08:00",   // give the time as a simple string
     Monday: "06:30",
     Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
@@ -23,19 +34,21 @@ db.UserProfile.create({
     Thursday: "06:30",
     Friday: "06:30",
     Saturday: "09:30"
+  }
+})
+  .then((returnedFromSequelize) => {
+    console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+    console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
+    return returnedFromSequelize;
   })
-})
-.then((returnedFromSequelize) => {
-  console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-  return returnedFromSequelize;
-})
-.then((priorInsertResponse) => {
-  db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-  .then((queryUser) => {
-    console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+  .then((priorInsertResponse) => {
+    db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+      .then((queryUser) => {
+        // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+        console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + queryUser.timePreference.Wednesday);
+      })
   })
-})
-}, 5000);  // we run the entire interval function 5 seconds after startup
+// }, 5000);  // we run the entire interval function 5 seconds after startup
 
 
 const DarkSky = require('dark-sky')
@@ -43,48 +56,49 @@ const DarkSky = require('dark-sky')
 const darksky = new DarkSky("93d657f3bdf48bc91d9977b8e970f9dc")
 
 darksky
-    .latitude('41.8703')            // required: latitude, string || float.
-    .longitude('-87.6236')            // required: longitude, string || float.
-    .time(moment().subtract(1, 'days'))             // optional: date, string 'YYYY-MM-DD'.
-    .units('us')                    // optional: units, string, refer to API documentation.
-    .language('en')                 // optional: language, string, refer to API documentation.
-    .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
-    .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
-    .get()                          // execute your get request.
-    .then((response) => {console.log(JSON.stringify(response));
-      return response;
+  .latitude('41.8703')            // required: latitude, string || float.
+  .longitude('-87.6236')            // required: longitude, string || float.
+  .time(moment().subtract(1, 'days'))             // optional: date, string 'YYYY-MM-DD'.
+  .units('us')                    // optional: units, string, refer to API documentation.
+  .language('en')                 // optional: language, string, refer to API documentation.
+  .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
+  .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
+  .get()                          // execute your get request.
+  .then((response) => {
+    console.log(JSON.stringify(response));
+    return response;
+  })
+  .then((response) => { console.log("===> " + response.daily.data[0].humidity); return response; })
+  .then((response) => {
+    db.WeatherData.create({
+      text: moment().subtract(1, 'days').toString(),
+      description: response.daily.data[0].summary
     })
-    .then((response) => {console.log("===> " + response.daily.data[0].humidity);return response;})
-    .then((response) => {
-      db.WeatherData.create({
-        text: moment().subtract(1, 'days').toString(),
-        description: response.daily.data[0].summary
-      })
       .then(() => {
         console.log("== inserted row with date: " + moment().subtract(1, 'days'));
       });
-    })
-    .catch(console.log);
+  })
+  .catch(console.log);
 
 
-    
 
 
-    // app.use('/a-week-ago', async (req, res, next) => {
-    //   try {
-    //     const { latitude, longitude } = req.body
-    //     const forecast = await darksky
-    //       .options({
-    //         latitude,
-    //         longitude,
-    //         time: moment().subtract(1, 'weeks')
-    //       })
-    //       .get()
-    //     res.status(200).json(forecast)
-    //   } catch (err) {
-    //     next(err)
-    //   }
-    // });
+
+// app.use('/a-week-ago', async (req, res, next) => {
+//   try {
+//     const { latitude, longitude } = req.body
+//     const forecast = await darksky
+//       .options({
+//         latitude,
+//         longitude,
+//         time: moment().subtract(1, 'weeks')
+//       })
+//       .get()
+//     res.status(200).json(forecast)
+//   } catch (err) {
+//     next(err)
+//   }
+// });
 
 module.exports = function (app) {
   // Get all examples
