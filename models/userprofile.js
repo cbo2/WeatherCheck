@@ -5,7 +5,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false
     },
     password: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
       allowNull: false
     },
     name: {
@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false
     },
     phone: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
       allowNull: false
     },
     zipcode: {
