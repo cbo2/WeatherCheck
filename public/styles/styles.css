@@ -1,6 +1,5 @@
 body {
   background-image: url(http://i1076.photobucket.com/albums/w450/kelzzxo/clouds_zpsoobcqqg0.jpg);
-  /* font-family: 'Merriweather Sans', sans-serif; */
   font-family: 'Cinzel', serif;
   font-size: 16px;
   background-repeat: no-repeat;
@@ -17,10 +16,90 @@ h1, p {
   color: gold;
 }
 
+h2 {
+  color: black;
+  text-align: center;
+  font-family: 'Artifika', serif;
+}
 #jmbo {
   background: transparent
 }
 
 #signUp {
   color: gold;
+  
+}
+
+#backgrnd {
+  background: transparent;
+}
+
+
+.input {
+  width: 75%;
+  height: 50px;
+  display: block;
+  margin: 0 auto 15px;
+  padding: 0 15px;
+  border: none;
+  border-bottom: 2px solid #ebebeb;
+}
+.input:focus {
+  outline: none;
+  border-bottom-color: #3CC !important;
+}
+.input:hover {
+  border-bottom-color: #dcdcdc;
+}
+.input:invalid {
+  box-shadow: none;
+}
+
+.pass:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset;
+}
+
+.inputButton {
+  position: relative;
+  width: 85%;
+  height: 50px;
+  display: block;
+  margin: 30px auto 30px;
+  color: white;
+  background-color: #3CC;
+  border: none;
+  -webkit-box-shadow: 0 5px 0 #2CADAD;
+  -moz-box-shadow: 0 5px 0 #2CADAD;
+  box-shadow: 0 5px 0 #2CADAD;
+}
+.inputButton:hover {
+  top: 2px;
+  -webkit-box-shadow: 0 3px 0 #2CADAD;
+  -moz-box-shadow: 0 3px 0 #2CADAD;
+  box-shadow: 0 3px 0 #2CADAD;
+}
+.inputButton:active {
+  top: 5px;
+  box-shadow: none;
+}
+.inputButton:focus {
+  outline: none;
+}
+
+/* .container {
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+} */
+
+
+#logbox {
+
+  padding: 10px;
+  margin: 60px auto;
+  width: 340px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }

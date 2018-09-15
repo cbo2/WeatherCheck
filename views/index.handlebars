@@ -2,28 +2,38 @@
   <div class="container">
     <h1 class="display-4 center">{{msg}}</h1>
     <p class="lead center">{{title}}</p>
-  </div>
-  <div class="container">
 
-    <form id="signUp">
-      <div class="form-group row">
-        <label for="inputEmail3" class="col-sm-2 col-form-label">User Name</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="inputEmail3" placeholder="User Name">
-        </div>
+  </div>
+
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <div id="logbox">
+        <form id="signup" method="post" action="/signup">
+          <h2>Create an Account</h2>
+          <input name="user[name]" type="text" placeholder="Your Name" required="required" class="input pass" />
+          <input name="user[phomeNum]" type="number" placeholder="Your Phone Number" required="required" class="input pass" />
+          <input type="submit" value="Sign me up!" class="inputButton" />
+
+        </form>
       </div>
-      <div class="form-group row">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Phone Number</label>
-        <div class="col-sm-10">
-          <input type="number" class="form-control" id="inputPassword3" placeholder="Phone Number">
-        </div>
+    </div>
+    {{!-- <div class="col-sm">
+      
+    </div> --}}
+    <div class="col-sm">
+      <div id="logbox">
+        <form id="signup" method="post" action="/signup">
+          <h2>Log In</h2>
+          <input name="user[name]" type="text" placeholder="Your Name" class="input pass" />
+          <input name="user[password]" type="password" placeholder="Enter Password" required="required" class="input pass" />
+          <input type="submit" value="Log In!" class="inputButton" />
+
+        </form>
       </div>
-      <div class="form-group row">
-        <div class="col-sm-10">
-          <button type="submit" class="btn btn-success">Sign up</button>
-        </div>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -31,36 +41,5 @@
 
 
 
-{{!-- <div id="home">
-  <div class="container">
-    <div class="row">
-      <div class="col-8 offset-2">
-        <h1 id="pgTitle">{{msg}}</h1>
-        <h2></h2>
-        <form class="clearfix mb-4" action="POST">
-          <div class="form-group">
-            <label for="example-text">Example Text</label>
-            <input type="text" id="example-text" class="form-control" aria-describedby="example-text" placeholder="Enter Example Text">
-          </div>
-          <div class="form-group">
-            <label for="example-description">Example Description</label>
-            <textarea class="form-control" id="example-description" aria-describedby="example-description" placeholder="Enter Example Description"></textarea>
-          </div>
-          <button id="submit" class="btn btn-primary float-right">Submit</button>
-        </form>
-        <h3>Examples:</h3>
-        <ul id="example-list" class="list-group">
-          {{#each examples}}
-          <li data-id="{{this.id}}" class="list-group-item">
-            <a href="example/{{this.id}}">{{this.text}}</a>
-            <button class="btn btn-danger float-right delete">ｘ</button>
-          </li>
-          {{/each}}
-        </ul>
-      </div>
-    </div>
-  </div>
-</div> --}}
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="/js/index.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="/js/index.js"></script>
