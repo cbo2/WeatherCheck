@@ -11,3 +11,16 @@ body {
   font-family: 'Alegreya', serif;
   align-content: center;
 }
+
+h1, p {
+  text-align: center;
+  color: gold;
+}
+
+#jmbo {
+  background: transparent
+}
+
+#signUp {
+  color: gold;
+}
