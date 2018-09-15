@@ -6,23 +6,27 @@ module.exports = function (app) {
     // db.weather.findAll({}).then(function(dbExamples) {
     res.render("index", {
       msg: "Weather Check✔️",
-      title: "Sign up for daily text messages for the weather of the day",
+      title: "Sign up for daily text messages for the weather of the day"
     });
     // });
   });
 
-  // Load example page and pass in an example by id
-  app.get("/login", function (req, res) {
+  app.get("/signup", function (req, res) {
     // db.weather.user({ where: { id: req.params.id } }).then(function (user) {
-    res.render("login", {
-      msg: "Welcome Back",
-      title: "Please Log In"
+    res.render("profile", {
+      msg: "Welcome",
+      title: "Please fill out information below to create a new account!"
     });
     // });
   });
 
-  // Render 404 page for any unmatched routes
-  app.get("*", function (req, res) {
-    res.render("404");
+  app.get("/signin", function (req, res){
+    res.render("profile", {
+      msg: "Welcome Back"
+    });
+  });
+
+  app.post("/profile", function (req, res) {
+    res.render("profile");
   });
 };

@@ -12,8 +12,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+
     phoneNumber: {
       type: DataTypes.DECIMAL(11),
+
       allowNull: false
     },
     zipcode: {
