@@ -4,6 +4,29 @@ var yw = require('weather-yahoo');
 var moment = require('moment');
 moment().format();
 
+// Twilio Stuff...
+var twilio = require('twilio');
+require("dotenv").config();
+
+var sid = process.env.TWILIO_SID;
+var token = process.env.TWILIO_TOKEN;
+
+console.log("the sid is: " + sid);
+console.log("the token is: " + token);
+
+// Find your account sid and auth token in your Twilio account Console.
+var client = new twilio(sid, token);
+
+// Send the text message.
+client.messages.create({
+  to: '+16309955170',
+  from: '+16307915544',
+  body: "started running the node app at: " + moment().format() + " !!"
+}).then((message) => console.log(message.sid))
+.catch(err => console.log(err));
+
+// end Twilio Stuff
+
 var schedule = require('node-schedule');
 
 var j = schedule.scheduleJob('03 * * * *', function () {
