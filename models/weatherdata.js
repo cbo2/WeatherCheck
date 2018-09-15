@@ -16,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING
     },
     zipcode: {
-      type: DataTypes.STRING
+      type: DataTypes.DECIMAL(5)
     }
   });
   return WeatherData;
