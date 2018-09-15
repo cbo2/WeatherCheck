@@ -1,9 +1,42 @@
-<div id="home">
+<div id="jmbo" class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4 center">{{msg}}</h1>
+    <p class="lead center">{{title}}</p>
+  </div>
+  <div class="container">
+
+    <form id="signUp">
+      <div class="form-group row">
+        <label for="inputEmail3" class="col-sm-2 col-form-label">User Name</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="inputEmail3" placeholder="User Name">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="inputPassword3" class="col-sm-2 col-form-label">Phone Number</label>
+        <div class="col-sm-10">
+          <input type="number" class="form-control" id="inputPassword3" placeholder="Phone Number">
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-10">
+          <button type="submit" class="btn btn-success">Sign up</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+{{!-- <div id="home">
   <div class="container">
     <div class="row">
       <div class="col-8 offset-2">
-        <h1>{{msg}}</h1>
-        <h2>This is our Home Page!</h2>
+        <h1 id="pgTitle">{{msg}}</h1>
+        <h2></h2>
         <form class="clearfix mb-4" action="POST">
           <div class="form-group">
             <label for="example-text">Example Text</label>
@@ -27,7 +60,7 @@
       </div>
     </div>
   </div>
-</div>
+</div> --}}
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/js/index.js"></script>
