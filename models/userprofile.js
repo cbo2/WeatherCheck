@@ -12,10 +12,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-
+    phone: {
+      type: DataTypes.STRING,
+    },
     phoneNumber: {
       type: DataTypes.DECIMAL(11),
-
       allowNull: false
     },
     zipcode: {
@@ -26,5 +27,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.JSON
     }
   });
+
   return UserProfile;
 };
