@@ -93,7 +93,6 @@ module.exports = function (app) {
 
   //Push Data into database
   app.post("/api/weatherdata", function (req, res) {
-    db.WeatherData.create()
   })
 
   // Create a new profile
@@ -103,6 +102,43 @@ module.exports = function (app) {
       res.json(dbExample);
     });
   });
+
+  app.post("/api/newProfile", function (req, res) {
+
+    // prototype adding a user to the system
+    db.UserProfile.create({
+      username: req.body.username,
+      // timePreference: JSON.stringify({
+      timePreference: {
+        Sunday: "08:00",   // give the time as a simple string
+        Monday: "06:30",
+        Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+        Wednesday: "06:30",
+        Thursday: "06:30",
+        Friday: "06:30",
+        Saturday: "09:30"
+      },
+      password: req.body.password,
+
+      name: req.body.name,
+
+      phoneNumber: req.body.phoneNumber,
+
+      phone: req.body.phone,
+
+      zipcode: req.body.zipcode
+    }).then((returnedFromSequelize) => {
+        console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+        console.log("** today is " + moment().format("dddd"));  // use moment to determine what kind of day today is
+        return returnedFromSequelize;
+      }).then((priorInsertResponse) => {
+        db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+          .then((queryUser) => {
+            // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+            console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + queryUser.timePreference.moment().format("dddd"));
+          })
+      })
+  })
 
   // get a profile by id
   app.get("/api/profile/:id", function (req, res) {
