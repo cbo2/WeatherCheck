@@ -5,6 +5,29 @@ var moment = require('moment');
 moment().format();
 
 var schedule = require('node-schedule');
+
+//------------------------------------------
+var NodeGeocoder = require('node-geocoder');
+ 
+var options = {
+  provider: 'freegeoip',
+ 
+  // Optional depending on the providers
+  httpAdapter: 'https', // Default
+  apiKey: 'YOUR_API_KEY', // for Mapquest, OpenCage, Google Premier
+  formatter: null         // 'gpx', 'string', ...
+};
+var geocoder = NodeGeocoder(options);
+
+// Or using Promise
+geocoder.geocode('60632')
+  .then(function(res) {
+    console.log(res);
+  })
+  .catch(function(err) {
+    console.log(err);
+  });
+//-----------------------------------------------------
  
 var j = schedule.scheduleJob('03 * * * *', function(){
   console.log('this runs only on the 3rd minute of each hour!!!');
