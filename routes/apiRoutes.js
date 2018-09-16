@@ -4,6 +4,27 @@ var yw = require('weather-yahoo');
 var moment = require('moment');
 moment().format();
 
+// zipcode longitude/latitude converter stuff start
+var NodeGeocoder = require('node-geocoder');
+var options = {
+  provider: 'google',
+ 
+  // Optional depending on the providers
+  httpAdapter: 'https', // Default
+  apiKey: process.env.GOOGLE_GEOCODE_KEY, // for Mapquest, OpenCage, Google Premier
+  formatter: null         // 'gpx', 'string', ...
+};
+var geocoder = NodeGeocoder(options);
+geocoder.geocode('60605', function(err, res) {
+  console.log("********************* GEOCODE Start **********************");
+  console.log("The latitude is: " + res[0].latitude);
+  console.log("The longitude is: " + res[0].longitude);
+  console.log("********************* GEOCODE End **********************");
+});
+
+// zipcode longitude/latitude converter stuff end
+
+
 // Twilio Stuff...
 var twilio = require('twilio');
 require("dotenv").config();
