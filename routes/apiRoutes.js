@@ -14,6 +14,7 @@ var options = {
   formatter: null         // 'gpx', 'string', ...
 };
 var geocoder = NodeGeocoder(options);
+
 geocoder.geocode('60605', function(err, res) {
   console.log("********************* GEOCODE Start **********************");
   console.log("The latitude is: " + res[0].latitude);
@@ -64,7 +65,7 @@ darksky
     .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
     .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
     .get()                          // execute your get request.
-    .then((response) => {//console.log(JSON.stringify(response)), 
+    .then((response) => {console.log(JSON.stringify(response)), 
       console.log(
               "\n" + '---------------------------' +
               "\n" + "This is today's forecast!" +
@@ -77,7 +78,22 @@ darksky
               "\n" + "Hourly wind speed: " + response.hourly.data[moment().format("H")].windSpeed + 
               "\n" + "Hourly chance of rain: " + response.hourly.data[moment().format("H")].precipProbability
             )
+            return response;
     })
+      // .then((response) => { console.log("===> " + response.daily.data[0].humidity); return response; })
+      .then((response) => {
+        db.WeatherData.create({
+          date: moment().subtract(0, 'days'),
+          hightemp: response.daily.data[0].temperatureHigh,
+          lowtemp: response.daily.data[0].temperatureLow,
+          precipitation: response.daily.data[0].precipProbability,
+          wind: response.hourly.data[moment().format("H")].windSpeed,
+          zipcode: response.hourly.data[moment().format("H")].windSpeed
+        })
+          .then(() => {
+            console.log("== inserted row with date: " + moment().subtract(1, 'days'));
+          });
+      })
     .catch(console.log);
 // Dark Sky API end-------------------------------------------------------------------------------------------------------------------
 
