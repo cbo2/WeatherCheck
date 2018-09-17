@@ -8,14 +8,14 @@ moment().format();
 var NodeGeocoder = require('node-geocoder');
 var options = {
   provider: 'google',
- 
+
   // Optional depending on the providers
   httpAdapter: 'https', // Default
   apiKey: process.env.GOOGLE_GEOCODE_KEY, // for Mapquest, OpenCage, Google Premier
   formatter: null         // 'gpx', 'string', ...
 };
 var geocoder = NodeGeocoder(options);
-geocoder.geocode('60605', function(err, res) {
+geocoder.geocode('60605', function (err, res) {
   console.log("********************* GEOCODE Start **********************");
   console.log("The latitude is: " + res[0].latitude);
   console.log("The longitude is: " + res[0].longitude);
@@ -40,11 +40,11 @@ var client = new twilio(sid, token);
 
 // Send the text message.
 client.messages.create({
-  to: '+16309955170',
+  to: '+16307915544',
   from: '+16307915544',
   body: "started running the node app at: " + moment().format() + " !!"
 }).then((message) => console.log(message.sid))
-.catch(err => console.log(err));
+  .catch(err => console.log(err));
 
 // end Twilio Stuff
 
@@ -56,14 +56,26 @@ var j = schedule.scheduleJob('03 * * * *', function () {
 
 // this next scheduled task we be the once-per-day midnight workhorse 
 // check this link for scheduling examples:  https://crontab.guru/every-night-at-midnight
-var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
+var dailyTask = schedule.scheduleJob('27 * * * *', function () {
   console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     // console.log(JSON.stringify(users));
-    users.map((user) => { console.log(user.username); });
+    users.map((user) => {
+      console.log(user.username);
+      var HHmmArray = user.timePreference.Sunday.split(":");
+      var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
+      console.log("the intended ctron string will be: " + scheduleDayTime);
+      schedule.scheduleJob(scheduleDayTime, sendNotificationTask(user.phoneNumber, user.zipcode));
+    });
   })
-  .catch(console.log);
+    .catch(console.log);
 });
+
+// function that will do all the work do send wise words in a notifcaiton to a user
+function sendNotificationTask(phoneNumber, zipcode) {
+  console.log("I am running for user with phoneNumber: " + phoneNumber);
+  console.log("and will get weather information for this user using zipcode: " + zipcode);
+}
 
 // setInterval(() => {
 // prototype adding a user to the system
@@ -71,14 +83,19 @@ db.UserProfile.create({
   username: "cbo",
   // timePreference: JSON.stringify({
   timePreference: {
-    Sunday: "08:00",   // give the time as a simple string
+    Sunday: "10:28",   // give the time as a simple string
     Monday: "06:30",
     Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "06:30",
     Thursday: "06:30",
     Friday: "06:30",
     Saturday: "09:30"
-  }
+  },
+  password: "password",
+  name: "craig",
+  phoneNumber: 6309955170,
+  phone: 6309955170,
+  zipcode: 60605
 })
   .then((returnedFromSequelize) => {
     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
@@ -115,8 +132,12 @@ darksky
   .then((response) => { console.log("===> " + response.daily.data[0].humidity); return response; })
   .then((response) => {
     db.WeatherData.create({
-      text: moment().subtract(1, 'days').toString(),
-      description: response.daily.data[0].summary
+      date: moment().subtract(0, 'days'),
+      hightemp: response.daily.data[0].temperatureHigh,
+      lowtemp: response.daily.data[0].temperatureLow,
+      precipitation: response.daily.data[0].precipProbability,
+      wind: response.hourly.data[moment().format("H")].windSpeed,
+      zipcode: response.hourly.data[moment().format("H")].windSpeed
     })
       .then(() => {
         console.log("== inserted row with date: " + moment().subtract(1, 'days'));

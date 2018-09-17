@@ -1,9 +1,32 @@
 module.exports = function(sequelize, DataTypes) {
   var UserProfile = sequelize.define("UserProfile", {
-    username: DataTypes.STRING,
-    password: DataTypes.STRING,
-    phoneNumber: DataTypes.DECIMAL(11),
-    timePreference: DataTypes.JSON
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    phone: {
+      type: DataTypes.STRING,
+    },
+    phoneNumber: {
+      type: DataTypes.DECIMAL(11),
+      allowNull: false
+    },
+    zipcode: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    timePreference: {
+      type: DataTypes.JSON
+    }
   });
+
   return UserProfile;
 };
