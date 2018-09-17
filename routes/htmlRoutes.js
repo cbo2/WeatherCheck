@@ -12,7 +12,7 @@ module.exports = function(app) {
     // });
   });
 
-  app.post("/signup", function(req, res) {
+  app.get("/signup", function(req, res) {
     // db.weather.user({ where: { id: req.params.id } }).then(function (user) {
     res.render("create", {
       msg: "Welcome",
