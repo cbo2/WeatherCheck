@@ -12,7 +12,7 @@ module.exports = function(app) {
     // });
   });
 
-  app.get("/signup", function(req, res) {
+  app.post("/signup", function(req, res) {
     // db.weather.user({ where: { id: req.params.id } }).then(function (user) {
     res.render("create", {
       msg: "Welcome",
@@ -21,6 +21,14 @@ module.exports = function(app) {
     // });
   });
 
+  app.get("/signup", function(req, res) {
+    // db.weather.user({ where: { id: req.params.id } }).then(function (user) {
+    res.render("create", {
+      msg: "Welcome",
+      title: "Please fill out information below to create a new account!"
+    });
+    // });
+  });
   // app.get("/signin", function(req, res) {
   //   res.render("profile", {
   //     msg: "Welcome Back"
