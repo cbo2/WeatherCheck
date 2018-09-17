@@ -54,9 +54,12 @@ var j = schedule.scheduleJob('03 * * * *', function () {
   console.log('this runs only on the 3rd minute of each hour!!!');
 });
 
+schedule.scheduleJob('31 23 * * *', sendNotificationTask(123456789, 60111));
+
+
 // this next scheduled task we be the once-per-day midnight workhorse 
 // check this link for scheduling examples:  https://crontab.guru/every-night-at-midnight
-var dailyTask = schedule.scheduleJob('27 * * * *', function () {
+var dailyTask = schedule.scheduleJob('41 * * * *', function () {
   console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     // console.log(JSON.stringify(users));
@@ -65,7 +68,11 @@ var dailyTask = schedule.scheduleJob('27 * * * *', function () {
       var HHmmArray = user.timePreference.Sunday.split(":");
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
       console.log("the intended ctron string will be: " + scheduleDayTime);
-      schedule.scheduleJob(scheduleDayTime, sendNotificationTask(user.phoneNumber, user.zipcode));
+      // schedule.scheduleJob(scheduleDayTime, sendNotificationTask(user.phoneNumber, user.zipcode));
+      schedule.scheduleJob('42 23 * * *', function (phoneNumber, zipcode) {
+        console.log("I am running for user with phoneNumber: " + phoneNumber);
+        console.log("and will get weather information for this user using zipcode: " + zipcode);
+      }.bind(null, user.phoneNumber, user.zipcode));
     });
   })
     .catch(console.log);
