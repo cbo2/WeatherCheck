@@ -152,11 +152,11 @@ var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
       var today = moment().format('dddd');
-      var HHmmArray = user.timePreference.today.moment().format('').split(":");
+      var HHmmArray = user.timePreference.today.split(":");
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
       schedule.scheduleJob(scheduleDayTime, function (phoneNumber, zipcode) {
         sendNotificationTask(phoneNumber, zipcode)
-        .bind(null, user.phoneNumber, user.zipcode);
+        .bind(null, user.phoneNumber, user.zipcode, today);
       });
     })
     .catch(console.log);
