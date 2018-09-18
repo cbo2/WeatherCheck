@@ -107,6 +107,12 @@ client.messages.create({
   .catch(err => console.log(err));
 // end Twilio Stuff---------------------------------------------------------------------------------------------------------
 
+var dailyTask = schedule.scheduleJob('44 * * * *', function () {
+  console.log("===>>>>> task at 44");
+});
+var dailyTask = schedule.scheduleJob('45 * * * *', function () {
+  console.log("===>>>>> task at 45");
+});
 
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
