@@ -17,3 +17,7 @@ NODE_ENV=development DB_PASSWORD=mypassword node server.js
 
 branch with some integration examples to view on github (NOTE: this branch won't be merged to master):
 cbo_prototype
+
+## Challenges
+* Since we are running background based timer tasks, got bit by heroku timezone.  Had to do this: heroku config:add TZ="America/Chicago"
+
