@@ -64,36 +64,36 @@ db.UserProfile.create({
       })
   })
 
-db.UserProfile.create({
-  username: "cbo2",
-  // timePreference: JSON.stringify({
-  timePreference: {
-    Sunday: "10:28",   // give the time as a simple string
-    Monday: "10:53",
-    Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-    Wednesday: "06:30",
-    Thursday: "06:30",
-    Friday: "06:30",
-    Saturday: "09:30"
-  },
-  password: "password",
-  name: "craig",
-  phoneNumber: 6309955170,
-  phone: 6309955170,
-  zipcode: 60605
-})
-  .then((returnedFromSequelize) => {
-    console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-    console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
-    return returnedFromSequelize;
-  })
-  .then((priorInsertResponse) => {
-    db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-      .then((queryUser) => {
-        // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-        console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
-      })
-  })
+// db.UserProfile.create({
+//   username: "cbo2",
+//   // timePreference: JSON.stringify({
+//   timePreference: {
+//     Sunday: "10:28",   // give the time as a simple string
+//     Monday: "10:53",
+//     Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+//     Wednesday: "06:30",
+//     Thursday: "06:30",
+//     Friday: "06:30",
+//     Saturday: "09:30"
+//   },
+//   password: "password",
+//   name: "craig",
+//   phoneNumber: 6309955170,
+//   phone: 6309955170,
+//   zipcode: 60605
+// })
+//   .then((returnedFromSequelize) => {
+//     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+//     console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
+//     return returnedFromSequelize;
+//   })
+//   .then((priorInsertResponse) => {
+//     db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+//       .then((queryUser) => {
+//         // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+//         console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
+//       })
+//   })
 
 // Find your account sid and auth token in your Twilio account Console.
 var client = new twilio(sid, token);
@@ -109,11 +109,15 @@ client.messages.create({
 
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
-var dailyTask = schedule.scheduleJob('58 * * * *', function () {
+// This function also needs to go to darksky and pull in the current day weather and put it into the db
+// and purge out any weather data older than 5 days
+var dailyTask = schedule.scheduleJob('38 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
       var today = moment().format('dddd');
+      purgeOldDataFromDB(today);
+      get5DaysWeatherInDB(user.zipcode);
       console.log("the value of today is: " + today);
       console.log("the value from the user for today is: " + user.timePreference[today]);
       var HHmmArray = user.timePreference[today].split(":");
@@ -139,6 +143,61 @@ var dailyTask = schedule.scheduleJob('58 * * * *', function () {
 function wiseWeatherWords(username) {
   console.log("running wiseWeatherWords for user id: " + username);
   return "Hello " + username + " It's gonna be hot!!!";
+}
+
+function purgeOldDataFromDB(today) {
+  var purgeDate = moment().subtract(4, 'days').format("YYYY-MM-DD");
+  db.WeatherData.destroy({ where: {
+     date: {
+       lt: purgeDate 
+      }
+    }
+  }).then((result) => {
+      console.log("== number of rows deleted: " + result);
+  });
+}
+
+function get5DaysWeatherInDB(zip) {
+  console.log("----------------- Getting 5 days weather for zip: " + zip + " -----------------------");
+  // first, convert zipcode to longitude/latitude
+  var latitude;
+  var longitude;
+  geocoder.geocode(zip, function (err, res) {
+    if (err) {
+      console.log("ERROR going to geocoder!!!!!!!!!!");
+      throw new Error("ERROR going to geocoder!!!!!!!!!!");
+    }
+    latitude = res[0].latitude;
+    longitude = res[0].longitude;
+  });
+
+  for (let i = 4; i > 0; i--) {
+    darksky
+      .latitude(latitude)            // required: latitude, string || float.
+      .longitude(longitude)            // required: longitude, string || float.
+      .time(moment().subtract(i, 'days'))             // optional: date, string 'YYYY-MM-DD'.
+      .units('us')                    // optional: units, string, refer to API documentation.
+      .language('en')                 // optional: language, string, refer to API documentation.
+      .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
+      .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
+      .get()                          // execute your get request.
+      .then((response) => {
+        console.log(">>>> the value of i is: " + i);
+        db.WeatherData.create({
+          date: moment.unix(response.daily.data[0].time).format("YYYY-MM-DD"),
+          hightemp: response.daily.data[0].temperatureHigh,
+          lowtemp: response.daily.data[0].temperatureLow,
+          precipitation: response.daily.data[0].precipProbability,
+          wind: response.hourly.data[moment().format("H")].windSpeed,
+          zipcode: response.hourly.data[moment().format("H")].windSpeed
+        })
+          .then((insertedRow) => {
+            console.log("== inserted row with date: " + insertedRow.date);
+            console.log("== inserted row with date: " + moment().subtract(i, 'days').format("YYYY-MM-DD") + " with i: " + i);
+          });
+      })
+      .catch(console.log);
+  }  // end for loop
 }
 
 // Dark Sky API Start-------------------------------------------------------------------------------------------------------
