@@ -39,7 +39,7 @@ db.UserProfile.create({
   timePreference: {
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
-    Tuesday: moment.utc("08:19", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Tuesday: moment.utc("10:59", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "06:30",
     Thursday: "06:30",
     Friday: "06:30",
@@ -70,7 +70,7 @@ db.UserProfile.create({
   timePreference: {
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
-    Tuesday: moment.utc("08:20", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "06:30",
     Thursday: "06:30",
     Friday: "06:30",
@@ -107,11 +107,10 @@ client.messages.create({
   .catch(err => console.log(err));
 // end Twilio Stuff---------------------------------------------------------------------------------------------------------
 
-
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
-var dailyTask = schedule.scheduleJob('17 * * * *', function () {
-  console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
+var dailyTask = schedule.scheduleJob('58 * * * *', function () {
+  console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
       var today = moment().format('dddd');
@@ -120,22 +119,25 @@ var dailyTask = schedule.scheduleJob('17 * * * *', function () {
       var HHmmArray = user.timePreference[today].split(":");
       console.log("will schedule task for user at: " + HHmmArray);
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
-      schedule.scheduleJob(scheduleDayTime, function (phoneNumber, zipcode) {
-        client.messages.create({
-          to: user.phoneNumber,
-          from: '+16307915544', // Don't touch me!
-          body: wiseWeatherWords(user.username),
-        }),
-          console.log("I am running for user with phoneNumber: " + phoneNumber);
-        console.log("and will get weather information for this user using zipcode: " + zipcode);
-      }.bind(null, user.phoneNumber, user.zipcode));
+      try {
+        schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
+          console.log("running for user id: " + username);
+          client.messages.create({
+            to: user.phoneNumber,
+            from: '+16307915544', // Don't touch me!
+            body: wiseWeatherWords(username),
+          }),
+            console.log("I am running for user with phoneNumber: " + phoneNumber);
+          console.log("and will get weather information for this user using zipcode: " + zipcode);
+        }.bind(null, user.username, user.phoneNumber, user.zipcode));
+      } catch (error) { console.log("*************** ERROR!!!! **********" + error); }
     })
   })
     .catch(console.log);
 });
 
-function wiseWeatherWords(id) {
-  console.log("running wiseWeatherWords for user id: " + id);
+function wiseWeatherWords(username) {
+  console.log("running wiseWeatherWords for user id: " + username);
   return "Hello " + username + " It's gonna be hot!!!";
 }
 
