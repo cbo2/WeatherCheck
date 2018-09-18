@@ -154,10 +154,7 @@ var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
       var today = moment().format('dddd');
       var HHmmArray = user.timePreference.today.split(":");
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
-      schedule.scheduleJob(scheduleDayTime, function (phoneNumber, zipcode) {
-        sendNotificationTask(phoneNumber, zipcode)
-        .bind(null, user.phoneNumber, user.zipcode, today);
-      });
+      schedule.scheduleJob(scheduleDayTime, sendNotificationTask(phoneNumber, zipcode).bind(null, user.phoneNumber, user.zipcode));
     })
     .catch(console.log);
   })
