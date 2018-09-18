@@ -15,7 +15,7 @@ var options = {
 };
 var geocoder = NodeGeocoder(options);
 
-geocoder.geocode('60605', function(err, res) {
+geocoder.geocode('60632', function(err, res) {
   console.log("********************* GEOCODE Start **********************");
   console.log("The latitude is: " + res[0].latitude);
   console.log("The longitude is: " + res[0].longitude);
@@ -151,7 +151,8 @@ var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
   console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
-      var HHmmArray = user.timePreference.moment().format('dddd').split(":");
+      var today = moment().format('dddd');
+      var HHmmArray = user.timePreference.today.moment().format('').split(":");
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
       schedule.scheduleJob(scheduleDayTime, function (phoneNumber, zipcode) {
         sendNotificationTask(phoneNumber, zipcode)
