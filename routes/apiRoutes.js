@@ -39,7 +39,7 @@ db.UserProfile.create({
   timePreference: {
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
-    Tuesday: moment.utc("09:17", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Tuesday: moment.utc("09:26", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "06:30",
     Thursday: "06:30",
     Friday: "06:30",
@@ -110,7 +110,7 @@ client.messages.create({
 
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
-var dailyTask = schedule.scheduleJob('16 * * * *', function () {
+var dailyTask = schedule.scheduleJob('25 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
@@ -120,16 +120,18 @@ var dailyTask = schedule.scheduleJob('16 * * * *', function () {
       var HHmmArray = user.timePreference[today].split(":");
       console.log("will schedule task for user at: " + HHmmArray);
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
-      schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
-        console.log("running for user id: " + username);
-        client.messages.create({
-          to: user.phoneNumber,
-          from: '+16307915544', // Don't touch me!
-          body: wiseWeatherWords(username),
-        }),
-          console.log("I am running for user with phoneNumber: " + phoneNumber);
-        console.log("and will get weather information for this user using zipcode: " + zipcode);
-      }.bind(null, user.username, user.phoneNumber, user.zipcode));
+      try {
+        schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
+          console.log("running for user id: " + username);
+          client.messages.create({
+            to: user.phoneNumber,
+            from: '+16307915544', // Don't touch me!
+            body: wiseWeatherWords(username),
+          }),
+            console.log("I am running for user with phoneNumber: " + phoneNumber);
+          console.log("and will get weather information for this user using zipcode: " + zipcode);
+        }.bind(null, user.username, user.phoneNumber, user.zipcode));
+      } catch (error) { console.log("*************** ERROR!!!! **********" + error); }
     })
   })
     .catch(console.log);
