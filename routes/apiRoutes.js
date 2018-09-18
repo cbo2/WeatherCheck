@@ -107,11 +107,11 @@ client.messages.create({
   .catch(err => console.log(err));
 // end Twilio Stuff---------------------------------------------------------------------------------------------------------
 
-var dailyTask = schedule.scheduleJob('44 * * * *', function () {
-  console.log("===>>>>> task at 44");
+var dailyTask = schedule.scheduleJob('50 * * * *', function () {
+  console.log("===>>>>> task at 50");
 });
-var dailyTask = schedule.scheduleJob('45 * * * *', function () {
-  console.log("===>>>>> task at 45");
+var dailyTask = schedule.scheduleJob('51 * * * *', function () {
+  console.log("===>>>>> task at 51");
 });
 
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
