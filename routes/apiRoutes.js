@@ -39,7 +39,7 @@ db.UserProfile.create({
   timePreference: {
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
-    Tuesday: moment.utc("09:26", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Tuesday: moment.utc("10:59", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "06:30",
     Thursday: "06:30",
     Friday: "06:30",
@@ -70,7 +70,7 @@ db.UserProfile.create({
   timePreference: {
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
-    Tuesday: moment.utc("09:10", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "06:30",
     Thursday: "06:30",
     Friday: "06:30",
@@ -107,16 +107,9 @@ client.messages.create({
   .catch(err => console.log(err));
 // end Twilio Stuff---------------------------------------------------------------------------------------------------------
 
-var dailyTask = schedule.scheduleJob('50 * * * *', function () {
-  console.log("===>>>>> task at 50");
-});
-var dailyTask = schedule.scheduleJob('51 * * * *', function () {
-  console.log("===>>>>> task at 51");
-});
-
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
-var dailyTask = schedule.scheduleJob('25 * * * *', function () {
+var dailyTask = schedule.scheduleJob('58 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
