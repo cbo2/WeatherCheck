@@ -29,15 +29,17 @@ module.exports = function(app) {
     });
     // });
   });
-  // app.get("/signin", function(req, res) {
-  //   res.render("profile", {
-  //     msg: "Welcome Back"
-  //   });
-  // });
+
+
+  app.get("/profile", function(req, res) {
+    res.render("profile", {
+      msg: "Welcome"
+    });
+  });
 
   app.post("/profile", function (req, res) {
     res.render("profile", {
-      msg: "Welcome Back"
+      msg: "Welcome"
     });
   });
 };
