@@ -119,42 +119,6 @@ module.exports = function (app) {
     });
   });
 
-  app.post("/api/newProfile", function (req, res) {
-
-    // prototype adding a user to the system
-    db.UserProfile.create({
-      username: req.body.username,
-      // timePreference: JSON.stringify({
-      timePreference: {
-        Sunday: "08:00",   // give the time as a simple string
-        Monday: "06:30",
-        Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-        Wednesday: "06:30",
-        Thursday: "06:30",
-        Friday: "06:30",
-        Saturday: "09:30"
-      },
-      password: req.body.password,
-
-      name: req.body.name,
-
-      phoneNumber: req.body.phoneNumber,
-
-      phone: req.body.phone,
-
-      zipcode: req.body.zipcode
-    }).then((returnedFromSequelize) => {
-        console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-        console.log("** today is " + moment().format("dddd"));  // use moment to determine what kind of day today is
-        return returnedFromSequelize;
-      }).then((priorInsertResponse) => {
-        db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-          .then((queryUser) => {
-            // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-            console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + queryUser.timePreference.moment().format("dddd"));
-          })
-      })
-  })
 
   // get a profile by id
   app.get("/api/profile/:id", function (req, res) {
@@ -174,14 +138,7 @@ module.exports = function (app) {
 
   // Initialize the function on app start up
   app.on('listening', function () {
-    var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
-      console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
-      db.UserProfile.findAll({}).then((users) => {
-        // console.log(JSON.stringify(users));
-        users.map((user) => { console.log(user.username); });
-      })
-      .catch(console.log);
-    });
+    dailyTask();
 });  
 
   function checkWeatherInterval() {
@@ -189,3 +146,63 @@ module.exports = function (app) {
   }
   setInterval(checkWeatherInterval, 5000);
 };
+
+var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
+  console.log("======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
+  db.UserProfile.findAll({}).then((users) => {
+    users.map((user) => {
+      var HHmmArray = user.timePreference.moment().format('dddd').split(":");
+      var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
+      schedule.scheduleJob(scheduleDayTime, function (phoneNumber, zipcode) {
+        sendNotificationTask(phoneNumber, zipcode)
+        .bind(null, user.phoneNumber, user.zipcode);
+      });
+    })
+    .catch(console.log);
+  })
+});
+
+// function that will do all the work do send wise words in a notifcaiton to a user
+function sendNotificationTask(phoneNumber, zipcode) {
+  client.messages.create({
+    to: user.phoneNumber,
+    from: '+16307915544', // Don't touch me!
+    body: wiseWeatherWords(),
+  }),
+  console.log("I am running for user with phoneNumber: " + phoneNumber);
+  console.log("and will get weather information for this user using zipcode: " + zipcode);
+}
+
+// setInterval(() => {
+// prototype adding a user to the system
+db.UserProfile.create({
+  username: "cbo",
+  // timePreference: JSON.stringify({
+  timePreference: {
+    Sunday: "10:28",   // give the time as a simple string
+    Monday: "06:30",
+    Tuesday: moment.utc("06:30", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Wednesday: "06:30",
+    Thursday: "06:30",
+    Friday: "06:30",
+    Saturday: "09:30"
+  },
+  password: "password",
+  name: "craig",
+  phoneNumber: 6309955170,
+  phone: 6309955170,
+  zipcode: 60605
+})
+  .then((returnedFromSequelize) => {
+    console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+    console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
+    return returnedFromSequelize;
+  })
+  .then((priorInsertResponse) => {
+    db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+      .then((queryUser) => {
+        // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+        console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + queryUser.timePreference.Wednesday);
+      })
+  })
+// }, 5000);  // we run the entire interval function 5 seconds after startup
