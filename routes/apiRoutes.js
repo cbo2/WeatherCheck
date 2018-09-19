@@ -40,7 +40,7 @@ db.UserProfile.create({
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
     Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-    Wednesday: "01:03",
+    Wednesday: "11:09",
     Thursday: "06:30",
     Friday: "06:30",
     Saturday: "09:30"
@@ -71,7 +71,7 @@ db.UserProfile.create({
 //     Sunday: "10:28",   // give the time as a simple string
 //     Monday: "10:53",
 //     Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-//     Wednesday: "06:30",
+//     Wednesday: "10:56",
 //     Thursday: "06:30",
 //     Friday: "06:30",
 //     Saturday: "09:30"
@@ -111,7 +111,7 @@ client.messages.create({
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
 // This function also needs to go to darksky and pull in the current day weather and put it into the db
 // and purge out any weather data older than 5 days
-var dailyTask = schedule.scheduleJob('02 * * * *', function () {
+var dailyTask = schedule.scheduleJob('08 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   var today = moment().format('dddd');
   purgeOldDataFromDB(today);
@@ -126,13 +126,19 @@ var dailyTask = schedule.scheduleJob('02 * * * *', function () {
       try {
         schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
           console.log("running for user id: " + username);
-          client.messages.create({
-            to: user.phoneNumber,
-            from: '+16307915544', // Don't touch me!
-            body: wiseWeatherWords(username, zipcode),
-          }),
+          // var weatherWisdom = wiseWeatherWords(username, zipcode).then(((wiz) => {
+          wiseWeatherWords(username, zipcode).then((wiz) => {
+            console.log("==> Got the weather wisdom of: " + wiz);
+            // });
+            console.log("Got the weather wisdom of: " + wiz);
+            client.messages.create({
+              to: user.phoneNumber,
+              from: '+16307915544', // Don't touch me!
+              body: wiz
+            });
             console.log("I am running for user with phoneNumber: " + phoneNumber);
-          console.log("and will get weather information for this user using zipcode: " + zipcode);
+            console.log("and will get weather information for this user using zipcode: " + zipcode);
+          });
         }.bind(null, user.username, user.phoneNumber, user.zipcode));
       } catch (error) { console.log("*************** ERROR!!!! **********" + error); }
     })
@@ -146,19 +152,22 @@ var dailyTask = schedule.scheduleJob('02 * * * *', function () {
 // compate today's forecast to the avg low
 // generate a string/comment saying if today will be WARMER or COOLER than avg (high and low)
 // also, you can add to the string/comment whether to bring an umbrella based on precip for today (if greater than 25%)
-function wiseWeatherWords(username, zip, today) {
+function wiseWeatherWords(username, zip) {
   console.log("running wiseWeatherWords for user id: " + username);
   // return "Hello " + username + " It's gonna be hot!!!";
- 
+
   var today = moment().format("YYYY-MM-DD");
+  var priorDay = moment().subtract(1, 'days').format("YYYY-MM-DD");
   var numRows = 0;
   var sumHighs = 0;
   var sumLows = 0;
   var todayHigh = 0;
   var todayLow = 0;
   var todayPrecip;
-  var wisdom = "";
-  db.WeatherData.findAll({
+  var priorDayHigh = 0;
+  var priorDayLow = 0;
+  var wisdom = "Weather for: " + username + "\n";
+  return db.WeatherData.findAll({
     where: {
       zipcode: zip
     }
@@ -167,21 +176,56 @@ function wiseWeatherWords(username, zip, today) {
       if (row.date === today) {
         todayHigh = row.hightemp;
         todayLow = row.lowtemp;
-        todayPrecip = row.precipProbability;
+        todayPrecip = row.precipitation;
       } else {
         numRows++;
         sumHighs += row.hightemp;
         sumLows += row.lowtemp;
+        if (row.date === priorDay) {
+          priorDayHigh = row.hightemp;
+          priorDayLow = row.lowtemp;
+        }
       }
     })
+
+    // wisdom regarding high temps
+    wisdom += (todayHigh > (sumHighs / numRows)
+      ? "Highs WARMER than trend\n" : "Highs COOLER than trend\n");
+    if (todayHigh > (priorDayHigh * 1.10)) {  // more than 10% warmer high than yesterday
+      wisdom += "Much warmer high than yesterday!\n";
+    } else if (todayHigh < (priorDayHigh * .90)) {  // more than 10% cooler high than yesterday
+      wisdom += "Much cooler high than yesterday!\n";
+    } else {
+      wisdom += "High temp not too different from yesterday!\n";
+    }
+
+    // wisdom regarding low temps
+    wisdom += (todayLow > (sumLows / numRows)
+      ? "Lows WARMER than trend\n" : "Lows COOLER than trend\n");
+    if (todayLow < (priorDayLow * .90)) {  // more than 10% cooler low than yesterday
+      wisdom += "Much cooler low than yesterday!\n";
+    } else if (todayLow > (priorDayLow * 1.10)) {  // more than 10% warmer low than yesterday
+      wisdom += "Much warmer low than yesterday!\n";
+    } else {
+      wisdom += "Low temp not too different from yesterday!\n";
+    }
+
+    // wisdom regarding precipitation
+    if (todayPrecip > 0.49) {
+      wisdom += "Bring your umbrella today!\n";
+    } else {
+      if (todayPrecip > 0.19) {
+        wisdom += "May need your umbrella today\n";
+      } else {
+        wisdom += "No umbrella needed";
+      }
+    }
+    console.log("___----> wisdom is: " + wisdom);
+    console.log("todays high: " + todayHigh + " and the average high: " + sumHighs / numRows);
+    console.log("today's low: " + todayLow + " and the average low: " + sumLows / numRows);
+    console.log("precip % today: " + todayPrecip);
+    return wisdom;
   }).catch(console.log);
-  wisdom += (todayHigh > (sumHighs / numRows) ? " WARMER " : " COOLER ");
-  wisdom += (todayPrecip > 0.25 ? " BRING AN UMBRELLA " : " NO UMBRELLA NEEDED ");
-  console.log("___----> wisdom is: " + wisdom);
-  console.log("todays high: " + todayHigh + " and the average high: " + sumHighs/numRows);
-  console.log("today's low: " + todayLow + " and the average low: " + sumLows/numRows);
-  console.log("precip % today: " + todayPrecip);
-  return wisdom;
 }
 
 function purgeOldDataFromDB(today) {
@@ -211,7 +255,7 @@ function get5DaysWeatherInDB(zip) {
 
     console.log("----------------- Getting 5 days weather for zip: " + zip + " and latitude: " + latitude + " and longitude: " + longitude + " -----------------------");
 
-    for (let i = 4; i > 0; i--) {
+    for (let i = 4; i >= 0; i--) {
       darksky
         .latitude(latitude)            // required: latitude, string || float.
         .longitude(longitude)            // required: longitude, string || float.
@@ -245,49 +289,6 @@ function get5DaysWeatherInDB(zip) {
 const DarkSky = require('dark-sky')
 const darksky = new DarkSky(process.env.DARK_SKY)
 
-// darksky
-//   .latitude('41.8703')            // required: latitude, string || float.
-//   .longitude('-87.6236')            // required: longitude, string || float.
-//   .time(moment().subtract(0, 'days'))             // optional: date, string 'YYYY-MM-DD'.
-//   .units('us')                    // optional: units, string, refer to API documentation.
-//   .language('en')                 // optional: language, string, refer to API documentation.
-//   .exclude('minutely,flags')      // optional: exclude, string || array, refer to API documentation.
-//   .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
-//   .get()                          // execute your get request.
-//   .then((response) => {
-//     console.log("\n\n\n\n" + JSON.stringify(response) + "\n\n\n\n"),
-//       console.log(
-//         "\n" + '---------------------------' +
-//         "\n" + "This is today's forecast!" +
-//         "\n" + "Today's high: " + response.daily.data[0].temperatureHigh +
-//         "\n" + "Today's low: " + response.daily.data[0].temperatureLow +
-//         "\n" + "Chance of precipitation: " + response.daily.data[0].precipProbability +
-//         "\n" + "Hourly temp: " + response.hourly.data[moment().format("H")].temperature +
-//         "\n" + "Hourly sensation: " + response.hourly.data[moment().format("H")].apparentTemperature +
-//         "\n" + "Hourly humidity: " + response.hourly.data[moment().format("H")].humidity +
-//         "\n" + "Hourly wind speed: " + response.hourly.data[moment().format("H")].windSpeed +
-//         "\n" + "Hourly chance of rain: " + response.hourly.data[moment().format("H")].precipProbability
-//       )
-//     return response;
-//   })
-//   // .then((response) => { console.log("===> " + response.daily.data[0].humidity); return response; })
-//   .then((response) => {
-//     db.WeatherData.create({
-//       date: moment().subtract(0, 'days'),
-//       hightemp: response.daily.data[0].temperatureHigh,
-//       lowtemp: response.daily.data[0].temperatureLow,
-//       precipitation: response.daily.data[0].precipProbability,
-//       wind: response.hourly.data[moment().format("H")].windSpeed,
-//       zipcode: response.hourly.data[moment().format("H")].windSpeed
-//     })
-//       .then(() => {
-//         console.log("== inserted row with date: " + moment().subtract(1, 'days'));
-//       });
-//   })
-//   .catch(console.log);
-// Dark Sky API end-------------------------------------------------------------------------------------------------------------------
-
-
 module.exports = function (app) {
   // Get all examples
   app.get("/api/login", function (req, res) {
@@ -303,11 +304,12 @@ module.exports = function (app) {
 
   // Create a new profile
   app.post("/api/profile", function (req, res) {
-    console.log("hit the put route /api/profile with body: " + JSON.stringify(req.body));
-    // db.Example.create(req.body).then(function (dbExample) {
-    // res.json(dbExample);
-    // });
-    res.end();
+    console.log("hit the post route /api/profile with body: " + JSON.stringify(req.body));
+    console.log("Will get weather data in the database for this user: " + req.body.username + " with zipcode: " + req.body.zipcode);
+    get5DaysWeatherInDB(req.body.zipcode);
+    db.UserProfile.create(req.body).then(function (dbUser) {
+      res.json(dbUser);
+    });
   });
 
 
