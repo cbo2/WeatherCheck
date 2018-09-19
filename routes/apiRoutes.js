@@ -111,12 +111,12 @@ client.messages.create({
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
 // This function also needs to go to darksky and pull in the current day weather and put it into the db
 // and purge out any weather data older than 5 days
-var dailyTask = schedule.scheduleJob('38 * * * *', function () {
+var dailyTask = schedule.scheduleJob('00 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
+  var today = moment().format('dddd');
+  purgeOldDataFromDB(today);
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
-      var today = moment().format('dddd');
-      purgeOldDataFromDB(today);
       get5DaysWeatherInDB(user.zipcode);
       console.log("the value of today is: " + today);
       console.log("the value from the user for today is: " + user.timePreference[today]);
@@ -147,13 +147,14 @@ function wiseWeatherWords(username) {
 
 function purgeOldDataFromDB(today) {
   var purgeDate = moment().subtract(4, 'days').format("YYYY-MM-DD");
-  db.WeatherData.destroy({ where: {
-     date: {
-       lt: purgeDate 
+  db.WeatherData.destroy({
+    where: {
+      date: {
+        lt: purgeDate
       }
     }
   }).then((result) => {
-      console.log("== number of rows deleted: " + result);
+    console.log("== number of rows deleted: " + result);
   });
 }
 
