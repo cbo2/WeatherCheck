@@ -4,16 +4,16 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATEONLY
     },
     hightemp: {
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER(5)
     },
     lowtemp: {
-      type: DataTypes.STRING
+      type: DataTypes.INTEGER(5)
     },
     precipitation: {
-      type: DataTypes.STRING
+      type: DataTypes.FLOAT
     },
     wind: {
-      type: DataTypes.STRING
+      type: DataTypes.FLOAT
     },
     zipcode: {
       type: DataTypes.DECIMAL(5)

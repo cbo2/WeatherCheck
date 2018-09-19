@@ -39,8 +39,8 @@ db.UserProfile.create({
   timePreference: {
     Sunday: "10:28",   // give the time as a simple string
     Monday: "10:53",
-    Tuesday: moment.utc("10:59", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-    Wednesday: "06:30",
+    Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Wednesday: "01:03",
     Thursday: "06:30",
     Friday: "06:30",
     Saturday: "09:30"
@@ -111,7 +111,7 @@ client.messages.create({
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
 // This function also needs to go to darksky and pull in the current day weather and put it into the db
 // and purge out any weather data older than 5 days
-var dailyTask = schedule.scheduleJob('00 * * * *', function () {
+var dailyTask = schedule.scheduleJob('02 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   var today = moment().format('dddd');
   purgeOldDataFromDB(today);
@@ -129,7 +129,7 @@ var dailyTask = schedule.scheduleJob('00 * * * *', function () {
           client.messages.create({
             to: user.phoneNumber,
             from: '+16307915544', // Don't touch me!
-            body: wiseWeatherWords(username),
+            body: wiseWeatherWords(username, zipcode),
           }),
             console.log("I am running for user with phoneNumber: " + phoneNumber);
           console.log("and will get weather information for this user using zipcode: " + zipcode);
@@ -140,9 +140,48 @@ var dailyTask = schedule.scheduleJob('00 * * * *', function () {
     .catch(console.log);
 });
 
-function wiseWeatherWords(username) {
+// get the historical data from the db and generate an average high and average low.
+// get the previous day from the historical data and see if it was wet/dry
+// compare today's forecast to the avg high
+// compate today's forecast to the avg low
+// generate a string/comment saying if today will be WARMER or COOLER than avg (high and low)
+// also, you can add to the string/comment whether to bring an umbrella based on precip for today (if greater than 25%)
+function wiseWeatherWords(username, zip, today) {
   console.log("running wiseWeatherWords for user id: " + username);
-  return "Hello " + username + " It's gonna be hot!!!";
+  // return "Hello " + username + " It's gonna be hot!!!";
+ 
+  var today = moment().format("YYYY-MM-DD");
+  var numRows = 0;
+  var sumHighs = 0;
+  var sumLows = 0;
+  var todayHigh = 0;
+  var todayLow = 0;
+  var todayPrecip;
+  var wisdom = "";
+  db.WeatherData.findAll({
+    where: {
+      zipcode: zip
+    }
+  }).then((rows) => {
+    rows.map((row) => {
+      if (row.date === today) {
+        todayHigh = row.hightemp;
+        todayLow = row.lowtemp;
+        todayPrecip = row.precipProbability;
+      } else {
+        numRows++;
+        sumHighs += row.hightemp;
+        sumLows += row.lowtemp;
+      }
+    })
+  }).catch(console.log);
+  wisdom += (todayHigh > (sumHighs / numRows) ? " WARMER " : " COOLER ");
+  wisdom += (todayPrecip > 0.25 ? " BRING AN UMBRELLA " : " NO UMBRELLA NEEDED ");
+  console.log("___----> wisdom is: " + wisdom);
+  console.log("todays high: " + todayHigh + " and the average high: " + sumHighs/numRows);
+  console.log("today's low: " + todayLow + " and the average low: " + sumLows/numRows);
+  console.log("precip % today: " + todayPrecip);
+  return wisdom;
 }
 
 function purgeOldDataFromDB(today) {
@@ -159,7 +198,6 @@ function purgeOldDataFromDB(today) {
 }
 
 function get5DaysWeatherInDB(zip) {
-  console.log("----------------- Getting 5 days weather for zip: " + zip + " -----------------------");
   // first, convert zipcode to longitude/latitude
   var latitude;
   var longitude;
@@ -170,81 +208,83 @@ function get5DaysWeatherInDB(zip) {
     }
     latitude = res[0].latitude;
     longitude = res[0].longitude;
-  });
 
-  for (let i = 4; i > 0; i--) {
-    darksky
-      .latitude(latitude)            // required: latitude, string || float.
-      .longitude(longitude)            // required: longitude, string || float.
-      .time(moment().subtract(i, 'days'))             // optional: date, string 'YYYY-MM-DD'.
-      .units('us')                    // optional: units, string, refer to API documentation.
-      .language('en')                 // optional: language, string, refer to API documentation.
-      .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
-      .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
-      .get()                          // execute your get request.
-      .then((response) => {
-        console.log(">>>> the value of i is: " + i);
-        db.WeatherData.create({
-          date: moment.unix(response.daily.data[0].time).format("YYYY-MM-DD"),
-          hightemp: response.daily.data[0].temperatureHigh,
-          lowtemp: response.daily.data[0].temperatureLow,
-          precipitation: response.daily.data[0].precipProbability,
-          wind: response.hourly.data[moment().format("H")].windSpeed,
-          zipcode: response.hourly.data[moment().format("H")].windSpeed
+    console.log("----------------- Getting 5 days weather for zip: " + zip + " and latitude: " + latitude + " and longitude: " + longitude + " -----------------------");
+
+    for (let i = 4; i > 0; i--) {
+      darksky
+        .latitude(latitude)            // required: latitude, string || float.
+        .longitude(longitude)            // required: longitude, string || float.
+        .time(moment().subtract(i, 'days'))             // optional: date, string 'YYYY-MM-DD'.
+        .units('us')                    // optional: units, string, refer to API documentation.
+        .language('en')                 // optional: language, string, refer to API documentation.
+        .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
+        .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
+        .get()                          // execute your get request.
+        .then((response) => {
+          console.log(">>>> the value of i is: " + i);
+          db.WeatherData.create({
+            date: moment.unix(response.daily.data[0].time).format("YYYY-MM-DD"),
+            hightemp: response.daily.data[0].temperatureHigh,
+            lowtemp: response.daily.data[0].temperatureLow,
+            precipitation: response.daily.data[0].precipProbability,
+            wind: response.hourly.data[moment().format("H")].windSpeed,
+            zipcode: zip
+          })
+            .then((insertedRow) => {
+              console.log("== inserted row with date: " + insertedRow.date);
+              console.log("== inserted row with date: " + moment().subtract(i, 'days').format("YYYY-MM-DD") + " with i: " + i);
+            });
         })
-          .then((insertedRow) => {
-            console.log("== inserted row with date: " + insertedRow.date);
-            console.log("== inserted row with date: " + moment().subtract(i, 'days').format("YYYY-MM-DD") + " with i: " + i);
-          });
-      })
-      .catch(console.log);
-  }  // end for loop
+        .catch(console.log);
+    }  // end for loop
+  });
 }
 
 // Dark Sky API Start-------------------------------------------------------------------------------------------------------
 const DarkSky = require('dark-sky')
 const darksky = new DarkSky(process.env.DARK_SKY)
 
-darksky
-  .latitude('41.8703')            // required: latitude, string || float.
-  .longitude('-87.6236')            // required: longitude, string || float.
-  .time(moment().subtract(0, 'days'))             // optional: date, string 'YYYY-MM-DD'.
-  .units('us')                    // optional: units, string, refer to API documentation.
-  .language('en')                 // optional: language, string, refer to API documentation.
-  .exclude('minutely,currently,flags')      // optional: exclude, string || array, refer to API documentation.
-  .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
-  .get()                          // execute your get request.
-  .then((response) => {
-    console.log(JSON.stringify(response)),
-      console.log(
-        "\n" + '---------------------------' +
-        "\n" + "This is today's forecast!" +
-        "\n" + "Today's high: " + response.daily.data[0].temperatureHigh +
-        "\n" + "Today's low: " + response.daily.data[0].temperatureLow +
-        "\n" + "Chance of precipitation: " + response.daily.data[0].precipProbability +
-        "\n" + "Hourly temp: " + response.hourly.data[moment().format("H")].temperature +
-        "\n" + "Hourly sensation: " + response.hourly.data[moment().format("H")].apparentTemperature +
-        "\n" + "Hourly humidity: " + response.hourly.data[moment().format("H")].humidity +
-        "\n" + "Hourly wind speed: " + response.hourly.data[moment().format("H")].windSpeed +
-        "\n" + "Hourly chance of rain: " + response.hourly.data[moment().format("H")].precipProbability
-      )
-    return response;
-  })
-  // .then((response) => { console.log("===> " + response.daily.data[0].humidity); return response; })
-  .then((response) => {
-    db.WeatherData.create({
-      date: moment().subtract(0, 'days'),
-      hightemp: response.daily.data[0].temperatureHigh,
-      lowtemp: response.daily.data[0].temperatureLow,
-      precipitation: response.daily.data[0].precipProbability,
-      wind: response.hourly.data[moment().format("H")].windSpeed,
-      zipcode: response.hourly.data[moment().format("H")].windSpeed
-    })
-      .then(() => {
-        console.log("== inserted row with date: " + moment().subtract(1, 'days'));
-      });
-  })
-  .catch(console.log);
+// darksky
+//   .latitude('41.8703')            // required: latitude, string || float.
+//   .longitude('-87.6236')            // required: longitude, string || float.
+//   .time(moment().subtract(0, 'days'))             // optional: date, string 'YYYY-MM-DD'.
+//   .units('us')                    // optional: units, string, refer to API documentation.
+//   .language('en')                 // optional: language, string, refer to API documentation.
+//   .exclude('minutely,flags')      // optional: exclude, string || array, refer to API documentation.
+//   .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
+//   .get()                          // execute your get request.
+//   .then((response) => {
+//     console.log("\n\n\n\n" + JSON.stringify(response) + "\n\n\n\n"),
+//       console.log(
+//         "\n" + '---------------------------' +
+//         "\n" + "This is today's forecast!" +
+//         "\n" + "Today's high: " + response.daily.data[0].temperatureHigh +
+//         "\n" + "Today's low: " + response.daily.data[0].temperatureLow +
+//         "\n" + "Chance of precipitation: " + response.daily.data[0].precipProbability +
+//         "\n" + "Hourly temp: " + response.hourly.data[moment().format("H")].temperature +
+//         "\n" + "Hourly sensation: " + response.hourly.data[moment().format("H")].apparentTemperature +
+//         "\n" + "Hourly humidity: " + response.hourly.data[moment().format("H")].humidity +
+//         "\n" + "Hourly wind speed: " + response.hourly.data[moment().format("H")].windSpeed +
+//         "\n" + "Hourly chance of rain: " + response.hourly.data[moment().format("H")].precipProbability
+//       )
+//     return response;
+//   })
+//   // .then((response) => { console.log("===> " + response.daily.data[0].humidity); return response; })
+//   .then((response) => {
+//     db.WeatherData.create({
+//       date: moment().subtract(0, 'days'),
+//       hightemp: response.daily.data[0].temperatureHigh,
+//       lowtemp: response.daily.data[0].temperatureLow,
+//       precipitation: response.daily.data[0].precipProbability,
+//       wind: response.hourly.data[moment().format("H")].windSpeed,
+//       zipcode: response.hourly.data[moment().format("H")].windSpeed
+//     })
+//       .then(() => {
+//         console.log("== inserted row with date: " + moment().subtract(1, 'days'));
+//       });
+//   })
+//   .catch(console.log);
 // Dark Sky API end-------------------------------------------------------------------------------------------------------------------
 
 
@@ -265,7 +305,7 @@ module.exports = function (app) {
   app.post("/api/profile", function (req, res) {
     console.log("hit the put route /api/profile with body: " + JSON.stringify(req.body));
     // db.Example.create(req.body).then(function (dbExample) {
-      // res.json(dbExample);
+    // res.json(dbExample);
     // });
     res.end();
   });
