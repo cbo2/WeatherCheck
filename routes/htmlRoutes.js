@@ -33,13 +33,13 @@ module.exports = function(app) {
 
   app.get("/profile", function(req, res) {
     res.render("profile", {
-      msg: "Welcome"
+      msg: "Welcome Back"
     });
   });
 
   app.post("/profile", function(req, res) {
     res.render("profile", {
-      msg: "Welcome"
+      msg: "Welcome Back"
     });
   });
 };
