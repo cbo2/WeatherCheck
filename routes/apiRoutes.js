@@ -281,10 +281,11 @@ module.exports = function (app) {
 
   // Create a new profile
   app.post("/api/profile", function (req, res) {
-    console.log("hit the post route /api/profile with body: " + req.body);
-    db.Example.create(req.body).then(function (dbExample) {
-      res.json(dbExample);
-    });
+    console.log("hit the put route /api/profile with body: " + JSON.stringify(req.body));
+    // db.Example.create(req.body).then(function (dbExample) {
+      // res.json(dbExample);
+    // });
+    res.end();
   });
 
 
