@@ -36,14 +36,15 @@ var handleSaveUsr = function () {
 
   $.ajax("/api/profile", {
     type: "POST",
-    data: {
+    data: JSON.stringify({
       name: "Must set",
       password: "MustSet",
       username: username,
       zipcode: zipcode,
       phoneNumber: phonenumber,
       timePreference: allTimes
-    }
+    }),
+    contentType:"application/json",
   }).then(function () {
     console.log("This User has been saved!");
     // location.reload();
