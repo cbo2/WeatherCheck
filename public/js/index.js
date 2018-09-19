@@ -2,6 +2,8 @@
 var $signUp = $("sign-up");
 var $logIn = $("log-in");
 var $newAcc = $("newAcc");
+var $saveUsr = $("saveUsr");
+var $saveTime = $("saveTime");
 
 //functions for clicks to render proper page
 
@@ -24,5 +26,3 @@ $signUp.on("click", handleSignUpClick);
 $logIn.on("click", handleSignInClick);
 
 $(newAcc).on("click", handleCreateAcc);
-
-
