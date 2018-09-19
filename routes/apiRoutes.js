@@ -140,9 +140,27 @@ var dailyTask = schedule.scheduleJob('00 * * * *', function () {
     .catch(console.log);
 });
 
+// get the historical data from the db and generate an average high and average low.
+// get the previous day from the historical data and see if it was wet/dry
+// compare today's forecast to the avg high
+// compate today's forecast to the avg low
+// generate a string/comment saying if today will be WARMER or COOLER than avg (high and low)
+// also, you can add to the string/comment whether to bring an umbrella based on precip for today (if greater than 25%)
 function wiseWeatherWords(username) {
-  console.log("running wiseWeatherWords for user id: " + username);
-  return "Hello " + username + " It's gonna be hot!!!";
+
+ console.log("running wiseWeatherWords for user id: " + username);
+
+
+//  return "Hello " + username + " It's gonna be hot!!!";
+//  var wiseString;
+//  if (temp > 90) {
+//    wiseString + " gonna be hot \n";
+//  }
+//  if (precip > 0.25) {
+//    wiseString + " bring an umbrella \n"
+//  }
+//  return wiseString;
+// }
 }
 
 function purgeOldDataFromDB(today) {
@@ -190,7 +208,7 @@ function get5DaysWeatherInDB(zip) {
           lowtemp: response.daily.data[0].temperatureLow,
           precipitation: response.daily.data[0].precipProbability,
           wind: response.hourly.data[moment().format("H")].windSpeed,
-          zipcode: response.hourly.data[moment().format("H")].windSpeed
+          zipcode: zip
         })
           .then((insertedRow) => {
             console.log("== inserted row with date: " + insertedRow.date);
@@ -238,7 +256,7 @@ darksky
       lowtemp: response.daily.data[0].temperatureLow,
       precipitation: response.daily.data[0].precipProbability,
       wind: response.hourly.data[moment().format("H")].windSpeed,
-      zipcode: response.hourly.data[moment().format("H")].windSpeed
+      zipcode: 60605
     })
       .then(() => {
         console.log("== inserted row with date: " + moment().subtract(1, 'days'));
