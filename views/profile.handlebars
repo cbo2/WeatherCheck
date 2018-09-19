@@ -4,65 +4,105 @@
   </div>
 </div>
 
+
 <div class="container">
-
-
-
-  <aside class="profile-card">
-
-
-    <div class="row">
-      <div class="col-sm">
-        <div class="input-field col s12">
-          <h4>Sunday</h4>
-          <input type="time" class="validate" id="timeInputSun">
-        </div>
-      </div>
-      <div class="col-sm">
-        <div class="input-field col s12">
-          <h4>Monday</h4>
-          <input type="time" class="validate" id="timeInputMon">
-        </div>
-      </div>
-      <div class="col-sm">
-        <div class="input-field col s12">
-          <h4>Tuesday</h4>
-          <input type="time" class="validate" id="timeInputTues">
-        </div>
-      </div>
+ <div class="card text-center">
       <div class="row">
-      <div class="col-sum">
-        <div class="input-field col s12">
-          <h4>Wednesday</h4>
-          <input type="time" class="validate" id="timeInputWed">
+      
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xs-offset-0 col-sm-offset-0 col-md-offset-3 col-lg-offset-3 toppad" >
+   
+   
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Hello Rion{{profile.name}}</h3>
+            </div>
+            <div class="panel-body text-center">
+              <div class="row">
+                <div class=" col-md-9 col-lg-9 "> 
+                  <table class="table table-user-information">
+                    <tbody>
+                      <tr>
+                        <td>User Name: {{profile.username}}</td>
+                        
+                      </tr>
+                      <tr>
+                        <td>Phone Number:{{profile.numebr}}</td>
+                      </tr>
+                      <tr>
+                        <td>Zip Code: {{profile.zipcode}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <input type="submit" value="Save" class="inputButton" id="saveUsr" />
+            </div>
+          </div>
         </div>
       </div>
-      {{!-- <div class="row"> --}}
-        <div class="col-sm">
-          <div class="input-field col s12">
-            <h4>Thursday</h4>
-            <input type="time" class="validate" id="timeInputThur">
-          </div>
-        </div>
-        <div class="col-sm">
-          <div class="input-field col s12">
-            <h4>Friday</h4>
-            <input type="time" class="validate" id="timeInputFri">
-          </div>
-        </div>
-        <div class="col-sm">
-          <div class="input-field col s12">
-            <h4>Saturday</h4>
-            <input type="time" class="validate" id="timeInputSat">
-          </div>
-        </div>
-        </div>
-        {{!--
-      </div> --}}  
-      <a href="/">← Back To Home</a>
     </div>
+</div>
 
-</aside>
+
+<div class="container">
+    <div class="card text-center">
+      <div class="card-header">
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Choose Your Text Times</h5>
+        <div class="row">
+          <div class="col-sm">
+            <div class="input-field col s12">
+              <h4>Sunday</h4>
+              <input type="time" class="validate" id="timeInputSun">
+            </div>
+          </div>
+          <div class="col-sm">
+            <div class="input-field col s12">
+              <h4>Monday</h4>
+              <input type="time" class="validate" id="timeInputMon">
+            </div>
+          </div>
+          <div class="col-sm">
+            <div class="input-field col s12">
+              <h4>Tuesday</h4>
+              <input type="time" class="validate" id="timeInputTues">
+            </div>
+          </div>
+          {{!-- <div class="row"> --}}
+            <div class="col-sum">
+              <div class="input-field col s12">
+                <h4>Wednesday</h4>
+                <input type="time" class="validate" id="timeInputWed">
+              </div>
+            </div>
+            {{!-- <div class="row"> --}}
+              <div class="col-sm">
+                <div class="input-field col s12">
+                  <h4>Thursday</h4>
+                  <input type="time" class="validate" id="timeInputThur">
+                </div>
+              </div>
+              <div class="col-sm">
+                <div class="input-field col s12">
+                  <h4>Friday</h4>
+                  <input type="time" class="validate" id="timeInputFri">
+                </div>
+              </div>
+              <div class="col-sm">
+                <div class="input-field col s12">
+                  <h4>Saturday</h4>
+                  <input type="time" class="validate" id="timeInputSat">
+                </div>
+              </div>
+              <input type="submit" value="Save" class="inputButton" id="saveTime" />
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-muted text-center">
+          <a href="/">← Back To Home</a>
+        </div>
+      </div>
 </div>
 
 

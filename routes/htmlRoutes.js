@@ -37,7 +37,7 @@ module.exports = function(app) {
     });
   });
 
-  app.post("/profile", function (req, res) {
+  app.post("/profile", function(req, res) {
     res.render("profile", {
       msg: "Welcome"
     });
