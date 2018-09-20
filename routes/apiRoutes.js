@@ -347,9 +347,9 @@ module.exports = function (app) {
 
 
   // get a profile by id
-  app.get("/api/userlogin/", function (req, res) {
-    console.log("hit the get route /api/userlogin with data: " + JSON.stringify(req.body));
-    db.UserProfile.findOne({ where: { username: req.body.username } }).then(function (user) {
+  app.get("/api/userlogin/:username", function (req, res) {
+    console.log("hit the get route /api/userlogin with data: " + JSON.stringify(req.params.username));
+    db.UserProfile.findOne({ where: { username: req.params.username } }).then(function (user) {
       res.json(user);
     });
   });
