@@ -123,7 +123,7 @@ var dailyTask = schedule.scheduleJob('14 * * * *', function () {
       if (user.timePreference[today] === "") {
         console.log("******* the value for user: " + user.username + " does not want a notification on: " + today + "!  None will be scheduled!!");
         return;  // go to next user in uses.map() call
-      } 
+      }
       var HHmmArray = user.timePreference[today].split(":");
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * " + today.substring(0, 3);  // use substring to abbreviate the day to 3 chars
       console.log("will schedule task for user at: " + scheduleDayTime);
@@ -347,9 +347,9 @@ module.exports = function (app) {
 
 
   // get a profile by id
-  app.get("/api/profile/:id", function (req, res) {
-    console.log("hit the get route /api/profile by id: " + req.params.id);
-    db.Example.destroy({ where: { id: req.params.id } }).then(function (dbExample) {
+  app.get("/api/userlogin/", function (req, res) {
+    console.log("hit the get route /api/userlogin with data: " + JSON.stringify(req.body));
+    db.UserProfile.findOne({ where: { username: req.body.username } }).then(function (user) {
       res.json(dbExample);
     });
   });
