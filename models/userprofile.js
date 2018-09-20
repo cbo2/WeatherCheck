@@ -10,15 +10,15 @@ module.exports = function(sequelize, DataTypes) {
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     phoneNumber: {
       type: DataTypes.DECIMAL(11),
-      allowNull: false
+      allowNull: true
     },
     zipcode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     timePreference: {
       type: DataTypes.JSON
