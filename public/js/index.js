@@ -4,7 +4,6 @@ var $logIn = $("#log-in");
 var $newAcc = $("#newAcc");
 var $saveUsr = $("#saveUsr");
 
-
 //functions for clicks to render proper page
 
 var handleSignUpClick = function () {
@@ -32,22 +31,24 @@ var handleSaveUsr = function () {
     Friday: $("#timeInputFri").val(),
     Saturday: $("#timeInputSat").val()
   };
-
+  
   console.log(username, zipcode, phonenumber, allTimes);
 
   $.ajax("/api/profile", {
     type: "POST",
-    data: {
+    data: JSON.stringify({
+      name: "Must set",
+      password: "MustSet",
       username: username,
       zipcode: zipcode,
-      phonenumber: phonenumber,
-      timepreference: allTimes
-    }
-  }).then(function() {
+      phoneNumber: phonenumber,
+      timePreference: allTimes
+    }),
+    contentType:"application/json",
+  }).then(function () {
     console.log("This User has been saved!");
     // location.reload();
-  }
-  );
+  });
 };
 
 //when signup button is clicked
