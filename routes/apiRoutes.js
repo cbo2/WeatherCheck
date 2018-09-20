@@ -325,7 +325,7 @@ module.exports = function (app) {
   });
 
   app.post("/api/createuser", function (req, res) {
-    console.log("hit the post route for /api/createuser with body of: " + JSON.stringify(req.body));
+    console.log("*********************>>>>>>>>>>>>>>>   hit the post route for /api/createuser with body of: " + JSON.stringify(req.body));
     db.UserProfile.create(req.body).then(function (dbUserCreated) {
       res.json(dbUserCreated);
     });
