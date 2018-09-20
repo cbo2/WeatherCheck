@@ -350,7 +350,7 @@ module.exports = function (app) {
   app.get("/api/userlogin/", function (req, res) {
     console.log("hit the get route /api/userlogin with data: " + JSON.stringify(req.body));
     db.UserProfile.findOne({ where: { username: req.body.username } }).then(function (user) {
-      res.json(dbExample);
+      res.json(user);
     });
   });
 
