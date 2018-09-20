@@ -41,7 +41,7 @@ db.UserProfile.create({
     Monday: "10:53",
     Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "11:09",
-    Thursday: "06:30",
+    Thursday: "09:47",
     Friday: "06:30",
     Saturday: "09:30"
   },
@@ -64,36 +64,36 @@ db.UserProfile.create({
       })
   })
 
-// db.UserProfile.create({
-//   username: "cbo2",
-//   // timePreference: JSON.stringify({
-//   timePreference: {
-//     Sunday: "10:28",   // give the time as a simple string
-//     Monday: "10:53",
-//     Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-//     Wednesday: "10:56",
-//     Thursday: "06:30",
-//     Friday: "06:30",
-//     Saturday: "09:30"
-//   },
-//   password: "password",
-//   name: "craig",
-//   phoneNumber: 6309955170,
-//   phone: 6309955170,
-//   zipcode: 60605
-// })
-//   .then((returnedFromSequelize) => {
-//     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-//     console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
-//     return returnedFromSequelize;
-//   })
-//   .then((priorInsertResponse) => {
-//     db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-//       .then((queryUser) => {
-//         // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-//         console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
-//       })
-//   })
+db.UserProfile.create({
+  username: "cbo2",
+  // timePreference: JSON.stringify({
+  timePreference: {
+    Sunday: "10:28",   // give the time as a simple string
+    Monday: "10:53",
+    Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+    Wednesday: "10:56",
+    Thursday: "09:48",
+    Friday: "06:30",
+    Saturday: "09:30"
+  },
+  password: "password",
+  name: "craig",
+  phoneNumber: 6309955170,
+  phone: 6309955170,
+  zipcode: 90210
+})
+  .then((returnedFromSequelize) => {
+    console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+    console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
+    return returnedFromSequelize;
+  })
+  .then((priorInsertResponse) => {
+    db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+      .then((queryUser) => {
+        // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+        console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
+      })
+  })
 
 // Find your account sid and auth token in your Twilio account Console.
 var client = new twilio(sid, token);
@@ -111,7 +111,7 @@ client.messages.create({
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
 // This function also needs to go to darksky and pull in the current day weather and put it into the db
 // and purge out any weather data older than 5 days
-var dailyTask = schedule.scheduleJob('08 * * * *', function () {
+var dailyTask = schedule.scheduleJob('46 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   var today = moment().format('dddd');
   purgeOldDataFromDB(today);
@@ -124,27 +124,49 @@ var dailyTask = schedule.scheduleJob('08 * * * *', function () {
       console.log("will schedule task for user at: " + HHmmArray);
       var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * *";
       try {
-        schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
-          console.log("running for user id: " + username);
-          // var weatherWisdom = wiseWeatherWords(username, zipcode).then(((wiz) => {
-          wiseWeatherWords(username, zipcode).then((wiz) => {
-            console.log("==> Got the weather wisdom of: " + wiz);
-            // });
-            console.log("Got the weather wisdom of: " + wiz);
-            client.messages.create({
-              to: user.phoneNumber,
-              from: '+16307915544', // Don't touch me!
-              body: wiz
-            });
-            console.log("I am running for user with phoneNumber: " + phoneNumber);
-            console.log("and will get weather information for this user using zipcode: " + zipcode);
-          });
-        }.bind(null, user.username, user.phoneNumber, user.zipcode));
+        // schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
+        var oneUserTask = schedule.scheduleJob(scheduleDayTime, userTask(user.username, user.phoneNumber, user.zipcode));
+        // oneUserTask.bind(null, user.username, user.phoneNumber, user.zipcode);
+
+        //     console.log("running for user id: " + username);
+        //   // var weatherWisdom = wiseWeatherWords(username, zipcode).then(((wiz) => {
+        //   wiseWeatherWords(username, zipcode).then((wiz) => {
+        //     console.log("==> Got the weather wisdom of: " + wiz);
+        //     // });
+        //     console.log("Got the weather wisdom of: " + wiz);
+        //     client.messages.create({
+        //       to: user.phoneNumber,
+        //       from: '+16307915544', // Don't touch me!
+        //       body: wiz
+        //     });
+        //     console.log("I am running for user with phoneNumber: " + phoneNumber);
+        //     console.log("and will get weather information for this user using zipcode: " + zipcode);
+        //   });
+        // }.bind(null, user.username, user.phoneNumber, user.zipcode));
       } catch (error) { console.log("*************** ERROR!!!! **********" + error); }
     })
   })
     .catch(console.log);
 });
+
+var userTask = function (username, phoneNumber, zipcode) {
+  return function () {
+    console.log("running for user id: " + username);
+    // var weatherWisdom = wiseWeatherWords(username, zipcode).then(((wiz) => {
+    wiseWeatherWords(username, zipcode).then((wiz) => {
+      console.log("==> Got the weather wisdom of: " + wiz);
+      // });
+      console.log("Got the weather wisdom of: " + wiz);
+      client.messages.create({
+        to: phoneNumber,
+        from: '+16307915544', // Don't touch me!
+        body: wiz
+      });
+      console.log("I am running for user with phoneNumber: " + phoneNumber);
+      console.log("and will get weather information for this user using zipcode: " + zipcode);
+    });
+  }.bind(null, username, phoneNumber, zipcode);
+}
 
 // get the historical data from the db and generate an average high and average low.
 // get the previous day from the historical data and see if it was wet/dry
