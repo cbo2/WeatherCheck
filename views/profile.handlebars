@@ -1,6 +1,6 @@
 <div id="jmbo" class="jumbotron jumbotron-fluid">
   <div class="container">
-    <h1 class="display-4 center">{{msg}} {{profile.username}}</h1>
+    <h1 class="display-4 center">{{msg}} {{user.username}}</h1>
   </div>
 </div>
 
@@ -14,7 +14,7 @@
    
           <div class="panel panel-info">
             <div class="panel-heading">
-              <h3 class="panel-title">Hello Rion{{profile.name}}</h3>
+              <h3 class="panel-title">Hello {{user.username}}</h3>
             </div>
             <div class="panel-body text-center">
               <div class="row">
@@ -22,13 +22,13 @@
                   <table class="table table-user-information">
                     <tbody>
                       <tr>
-                        <td><input name="user[name]" id="user" type="text" placeholder="User Name" class="input pass" /></td>
+                        <td><input name="user[name]" id="user" type="text" placeholder="{{user.name}}" class="input pass" /></td>
                         </tr>
                       <tr>
-                        <td><input name="user[zipcode]" id="zipcode" type="text" placeholder="ZipCode" class="input pass" /></td>
+                        <td><input name="user[zipcode]" id="zipcode" type="text" placeholder="{{user.zipcode}}" class="input pass" /></td>
                       </tr>
                       <tr>
-                        <td><input name="user[phonenumer]" id="phoneNum" type="text" placeholder="Phone Number" class="input pass" /></td>
+                        <td><input name="user[phonenumer]" id="phoneNum" type="text" placeholder="{{user.phoneNumber}}" class="input pass" /></td>
                       </tr>
                     </tbody>
                   </table>

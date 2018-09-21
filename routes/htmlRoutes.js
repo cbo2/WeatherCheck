@@ -31,15 +31,18 @@ module.exports = function(app) {
   });
 
 
+  app.post("/profile", function(req, res) {
+    console.log("Hitting the post route for /profile with data: " + JSON.stringify(req.body));
+    res.render("profile", {
+      msg: "Welcome Back",
+      user: req.body
+    });
+  });
+
   app.get("/profile", function(req, res) {
     res.render("profile", {
       msg: "Welcome Back"
     });
   });
 
-  app.post("/profile", function(req, res) {
-    res.render("profile", {
-      msg: "Welcome Back"
-    });
-  });
 };
