@@ -48,6 +48,23 @@ module.exports = function (app) {
     });
   });
 
+  app.post("/profile", function (req, res) {
+    console.log("hit the post route /profile with data: " + JSON.stringify(req.body));
+    db.UserProfile.findOne({ where: { username: req.body.username } }).then(function (userdata) {
+      if (req.body.password !== userdata.password) {
+        res.render("errorlogin", {
+          msg: "Wrong password!",
+          user: userdata
+        });
+      } else {
+        res.render("profile", {
+          msg: "Welcome ",
+          user: userdata
+        });
+      }
+    });
+  });
+
   app.get("/profile/:username", function (req, res) {
     console.log("hit the get route /profile with data: " + JSON.stringify(req.params.username));
     db.UserProfile.findOne({ where: { username: req.params.username } }).then(function (userdata) {
@@ -64,7 +81,7 @@ module.exports = function (app) {
 
     // app.get("/api/hourly/" + req.params.zipcode).then((response) => {
     res.render("hourly", {
-      hourly: 
+      hourly:
         [
           { "time": 1537333200, "summary": "Partly Cloudy", "icon": "partly-cloudy-night", "precipIntensity": 0.0015, "precipProbability": 0.01, "precipType": "rain", "temperature": 68.74, "apparentTemperature": 69.32, "dewPoint": 64.12, "humidity": 0.85, "pressure": 1014.97, "windSpeed": 4.15, "windGust": 5.16, "windBearing": 43, "cloudCover": 0.52, "uvIndex": 0, "visibility": 10, "ozone": 260.24 },
           { "time": 1537336800, "summary": "Partly Cloudy", "icon": "partly-cloudy-night", "precipIntensity": 0.002, "precipProbability": 0.02, "precipType": "rain", "temperature": 68.79, "apparentTemperature": 69.37, "dewPoint": 64.1, "humidity": 0.85, "pressure": 1014.92, "windSpeed": 6.13, "windGust": 7.61, "windBearing": 42, "cloudCover": 0.34, "uvIndex": 0, "visibility": 10, "ozone": 260.3 },

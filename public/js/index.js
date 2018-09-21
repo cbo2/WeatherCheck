@@ -7,21 +7,58 @@ var $saveUsr = $("#saveUsr");
 var API = {
   createNew: function (username, password) {
     console.log("We are here")
-    return $.ajax("/api/createuser", {
-      contentType: "application/json",
-      data: JSON.stringify({
-        username: username,
-        password: password
-      }),
-      type: "POST"
-    });
+
+    return $.post("/api/createuser", {
+      username: username,
+      password: password
+    }).then(function (data) {
+      window.location.replace(data);
+      // If there's an error, handle it by throwing up a bootstrap alert
+      // }).catch(console.log);
+    }).catch(handleLoginErr);
+
+
+    // return $.ajax("/api/createuser", {
+    //   contentType: "application/json",
+    //   data: JSON.stringify({
+    //     username: username,
+    //     password: password
+    //   }),
+    //   type: "POST"
+    // });
   },
 
   logIn: function (username, password) {
     console.log("Hello" + " " + username + " " + password);
-    window.location.href = "/profile/" + username;
+    // window.location.href = "/profile/" + username;
+    // return $.ajax("/profile", {
+    //   contentType: "application/json",
+    //   data: JSON.stringify({
+    //     username: username,
+    //     password: password
+    //   }),
+    //   type: "POST"
+    // });
+
+    $.post("/api/userlogin", {
+      username: username,
+      password: password
+    }).then(function (data) {
+      window.location.replace(data);
+      // If there's an error, log the error
+    }).catch(handleLoginErr);
+    // ).catch(function (err) {
+    //   console.log(err);
+    // });
+
   }
 };
+
+function handleLoginErr(err) {
+  console.log("we have an error: " + JSON.stringify(err));
+  alert(err.status + ": " + err.responseText);
+  // $("#alert").fadeIn(500);
+}
 
 //functions for clicks to render proper page
 
