@@ -44,7 +44,7 @@ db.UserProfile.create({
     Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
     Wednesday: "11:09",
     Thursday: "13:15",
-    Friday: "06:30",
+    Friday: "01:43",
     Saturday: "09:30"
   },
   password: "password",
@@ -113,7 +113,7 @@ client.messages.create({
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
 // This function also needs to go to darksky and pull in the current day weather and put it into the db
 // and purge out any weather data older than 5 days
-var dailyTask = schedule.scheduleJob('14 * * * *', function () {
+var dailyTask = schedule.scheduleJob('42 * * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   var today = moment().format('dddd');
   purgeOldDataFromDB(today);
@@ -122,16 +122,19 @@ var dailyTask = schedule.scheduleJob('14 * * * *', function () {
       get5DaysWeatherInDB(user.zipcode);
       console.log("the value of today is: " + today);
       console.log("the value from the user for today is: " + user.timePreference[today]);
-      if (user.timePreference[today] === "") {
-        console.log("******* the value for user: " + user.username + " does not want a notification on: " + today + "!  None will be scheduled!!");
-        return;  // go to next user in uses.map() call
-      }
-      var HHmmArray = user.timePreference[today].split(":");
-      var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * " + today.substring(0, 3);  // use substring to abbreviate the day to 3 chars
-      console.log("will schedule task for user at: " + scheduleDayTime);
+      // if (user.timePreference[today] === "") {
+      //   console.log("******* the value for user: " + user.username + " does not want a notification on: " + today + "!  None will be scheduled!!");
+      //   return;  // go to next user in uses.map() call
+      // }
+      // console.log("the value from the user for today is: " + user.timePreference[today]);
+      // var HHmmArray = user.timePreference[today].split(":");
+      // var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * " + today.substring(0, 3);  // use substring to abbreviate the day to 3 chars
+      // console.log("will schedule task for user at: " + scheduleDayTime);
       try {
         // schedule.scheduleJob(scheduleDayTime, function (username, phoneNumber, zipcode) {
-        var oneUserTask = schedule.scheduleJob(scheduleDayTime, userTask(user.username, user.phoneNumber, user.zipcode));
+        // var oneUserTask = schedule.scheduleJob(scheduleDayTime, userTask(user.username, user.phoneNumber, user.zipcode));
+        // var oneUserTask = scheduleTaskForOneUser(scheduleDayTime, user.username, user.phoneNumber, user.zipcode);
+        var oneUserTask = scheduleTaskForOneUser(user);
         // oneUserTask.bind(null, user.username, user.phoneNumber, user.zipcode);
 
         //     console.log("running for user id: " + username);
@@ -154,6 +157,19 @@ var dailyTask = schedule.scheduleJob('14 * * * *', function () {
   })
     .catch(console.log);
 });
+
+function scheduleTaskForOneUser(user) {
+  var today = moment().format('dddd');
+  if (user.timePreference[today] === "") {
+    console.log("******* the value for user: " + user.username + " does not want a notification on: " + today + "!  None will be scheduled!!");
+    return;  // go to next user in uses.map() call
+  }
+  console.log("the value from the user for today is: " + user.timePreference[today]);
+  var HHmmArray = user.timePreference[today].split(":");
+  var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * " + today.substring(0, 3);  // use substring to abbreviate the day to 3 chars
+  console.log("will schedule task for user at: " + scheduleDayTime);
+  return schedule.scheduleJob(scheduleDayTime, userTask(user.username, user.phoneNumber, user.zipcode));
+}
 
 var userTask = function (username, phoneNumber, zipcode) {
   return function () {
@@ -245,9 +261,10 @@ function wiseWeatherWords(username, zip) {
       if (todayPrecip > 0.19) {
         wisdom += "May need your umbrella today\n";
       } else {
-        wisdom += "No umbrella needed";
+        wisdom += "No umbrella needed\n";
       }
     }
+    wisdom += process.env.BASE_URL + "/profile/cbo2"
     console.log("___----> wisdom is: " + wisdom);
     console.log("todays high: " + todayHigh + " and the average high: " + sumHighs / numRows);
     console.log("today's low: " + todayLow + " and the average low: " + sumLows / numRows);
@@ -337,11 +354,12 @@ module.exports = function (app) {
   app.post("/api/weatherdata", function (req, res) {
   })
 
-  // Create a new profile
+  // Create a new profile or update an existing profile
   app.post("/api/profile", function (req, res) {
     console.log("hit the post route /api/profile with body: " + JSON.stringify(req.body));
     console.log("Will get weather data in the database for this user: " + req.body.username + " with zipcode: " + req.body.zipcode);
     get5DaysWeatherInDB(req.body.zipcode);
+    scheduleTaskForOneUser(req.body);
     db.UserProfile.create(req.body).then(function (dbUser) {
       res.json(dbUser);
     });
@@ -358,10 +376,10 @@ module.exports = function (app) {
   });
 
   // Delete an example by id
-  app.delete("/api/profile/:id", function (req, res) {
-    console.log("hit the delete route /api/profile by id: " + req.params.id);
-    db.Example.destroy({ where: { id: req.params.id } }).then(function (dbExample) {
-      res.json(dbExample);
+  app.delete("/api/profile/:username", function (req, res) {
+    console.log("hit the delete route /api/profile by id: " + req.params.username);
+    db.UserProfile.destroy({ where: { id: req.params.id } }).then(function (user) {
+      res.json(user);
     });
   });
 }
