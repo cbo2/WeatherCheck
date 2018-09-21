@@ -19,6 +19,8 @@ geocoder.geocode('60632', function (err, res) {
   console.log("********************* GEOCODE Start **********************");
   console.log("The latitude is: " + res[0].latitude);
   console.log("The longitude is: " + res[0].longitude);
+  // console.log("baseurl: " + window.location.origin);
+  console.log("baseurl: " + process.env.BASE_URL);
   console.log("********************* GEOCODE End **********************");
 });
 // zipcode longitude/latitude converter stuff end--------------------------------------------------------------------------------
