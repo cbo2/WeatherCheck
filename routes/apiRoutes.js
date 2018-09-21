@@ -35,67 +35,67 @@ var token = process.env.TWILIO_TOKEN;
 console.log("the sid is: " + sid);
 console.log("the token is: " + token);
 
-db.UserProfile.create({
-  username: "cbo",
-  // timePreference: JSON.stringify({
-  timePreference: {
-    Sunday: "10:28",   // give the time as a simple string
-    Monday: "10:53",
-    Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-    Wednesday: "11:09",
-    Thursday: "13:15",
-    Friday: "01:43",
-    Saturday: "09:30"
-  },
-  password: "password",
-  name: "craig",
-  phoneNumber: 6309955170,
-  phone: 6309955170,
-  zipcode: 60605
-})
-  .then((returnedFromSequelize) => {
-    console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-    console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
-    return returnedFromSequelize;
-  })
-  .then((priorInsertResponse) => {
-    db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-      .then((queryUser) => {
-        // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-        console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
-      })
-  })
+// db.UserProfile.create({
+//   username: "cbo",
+//   // timePreference: JSON.stringify({
+//   timePreference: {
+//     Sunday: "10:28",   // give the time as a simple string
+//     Monday: "10:53",
+//     Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+//     Wednesday: "11:09",
+//     Thursday: "13:15",
+//     Friday: "01:43",
+//     Saturday: "09:30"
+//   },
+//   password: "password",
+//   name: "craig",
+//   phoneNumber: 6309955170,
+//   phone: 6309955170,
+//   zipcode: 60605
+// })
+//   .then((returnedFromSequelize) => {
+//     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+//     console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
+//     return returnedFromSequelize;
+//   })
+//   .then((priorInsertResponse) => {
+//     db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+//       .then((queryUser) => {
+//         // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+//         console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
+//       })
+//   })
 
-db.UserProfile.create({
-  username: "cbo2",
-  // timePreference: JSON.stringify({
-  timePreference: {
-    Sunday: "10:28",   // give the time as a simple string
-    Monday: "10:53",
-    Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-    Wednesday: "10:56",
-    Thursday: "09:48",
-    Friday: "06:30",
-    Saturday: "09:30"
-  },
-  password: "password",
-  name: "craig",
-  phoneNumber: 6309955170,
-  phone: 6309955170,
-  zipcode: 90210
-})
-  .then((returnedFromSequelize) => {
-    console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-    console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
-    return returnedFromSequelize;
-  })
-  .then((priorInsertResponse) => {
-    db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-      .then((queryUser) => {
-        // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-        console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
-      })
-  })
+// db.UserProfile.create({
+//   username: "cbo2",
+//   // timePreference: JSON.stringify({
+//   timePreference: {
+//     Sunday: "10:28",   // give the time as a simple string
+//     Monday: "10:53",
+//     Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
+//     Wednesday: "10:56",
+//     Thursday: "09:48",
+//     Friday: "06:30",
+//     Saturday: "09:30"
+//   },
+//   password: "password",
+//   name: "craig",
+//   phoneNumber: 6309955170,
+//   phone: 6309955170,
+//   zipcode: 90210
+// })
+//   .then((returnedFromSequelize) => {
+//     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
+//     console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
+//     return returnedFromSequelize;
+//   })
+//   .then((priorInsertResponse) => {
+//     db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
+//       .then((queryUser) => {
+//         // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
+//         console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
+//       })
+//   })
 
 // Find your account sid and auth token in your Twilio account Console.
 var client = new twilio(sid, token);
@@ -208,6 +208,7 @@ function wiseWeatherWords(username, zip) {
   var todayHigh = 0;
   var todayLow = 0;
   var todayPrecip;
+  var todayWind = 0.0;
   var priorDayHigh = 0;
   var priorDayLow = 0;
   var wisdom = "Weather for: " + username + "\n";
@@ -221,6 +222,7 @@ function wiseWeatherWords(username, zip) {
         todayHigh = row.hightemp;
         todayLow = row.lowtemp;
         todayPrecip = row.precipitation;
+        todayWind = row.wind;
       } else {
         numRows++;
         sumHighs += row.hightemp;
@@ -231,6 +233,9 @@ function wiseWeatherWords(username, zip) {
         }
       }
     })
+
+    // start off by warning about wind if it is over 15mph
+    wisdom += (todayWind > 15.0) ? "Windy with " : "";
 
     // wisdom regarding high temps
     wisdom += (todayHigh > (sumHighs / numRows)
@@ -317,7 +322,7 @@ function get5DaysWeatherInDB(zip) {
             hightemp: response.daily.data[0].temperatureHigh,
             lowtemp: response.daily.data[0].temperatureLow,
             precipitation: response.daily.data[0].precipProbability,
-            wind: response.hourly.data[moment().format("H")].windSpeed,
+            wind: response.hourly.data[moment().format("H")].windGust,
             zipcode: zip
           })
             .then((insertedRow) => {
