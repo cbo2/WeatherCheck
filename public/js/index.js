@@ -27,15 +27,15 @@ var API = {
       },
       type: "GET",
       success: function (result) {
-        console.log("This is the result:" + result);
-        console.log("This is the result:" + result);
+        user = JSON.stringify(result);
+        console.log("This is the result:" + user);
         $.ajax({
           url: "/profile",
-          data: result,
+          data: user,
           type: "POST", 
           success: function(){
             console.log("This works!");
-            window.location.href = "/profile";
+            // window.location.href = "/profile";
           }
         });
       }
