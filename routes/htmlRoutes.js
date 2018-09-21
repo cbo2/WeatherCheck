@@ -52,10 +52,21 @@ module.exports = function (app) {
     console.log("hit the get route /profile with data: " + JSON.stringify(req.params.username));
     db.UserProfile.findOne({ where: { username: req.params.username } }).then(function (userdata) {
       res.render("profile", {
-        msg: "Welcome Back",
+        msg: "Welcome ",
         user: userdata
       });
     });
+  });
+
+  app.get("/hourly/:zipcode", function (req, res) {
+    console.log("hit the get route /hourly with data: " + JSON.stringify(req.params.zipcode));
+    // TODO - at this point get the hourly data from dark-sky by doing a get to the api route:
+
+    // app.get("/api/hourly/" + req.params.zipcode).then((response) => {
+    res.render("hourly", {
+      hourly: {}
+    });
+    // });
   });
 
 };
