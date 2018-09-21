@@ -19,27 +19,7 @@ var API = {
 
   logIn: function (username, password) {
     console.log("Hello" + " " + username + " " + password);
-    return $.ajax({
-      url: "/api/userlogin/" + username,
-      data: {
-        username: username,
-        password: password
-      },
-      type: "GET",
-      success: function (result) {
-        user = JSON.stringify(result);
-        console.log("This is the result:" + user);
-        $.ajax({
-          url: "/profile",
-          data: user,
-          type: "POST", 
-          success: function(){
-            console.log("This works!");
-            // window.location.href = "/profile";
-          }
-        });
-      }
-    });
+    window.location.href = "/profile/" + username;
   }
 };
 
