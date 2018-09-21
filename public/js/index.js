@@ -44,7 +44,7 @@ var handleCreateAcc = function (event) {
   var password = $("#password").val();
 
   API.createNew(username, password).then(function () {
-    $(this).attr("href", "/profile");
+    window.location.href = "/profile/" + username;
   });
 };
 
