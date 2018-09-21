@@ -22,8 +22,8 @@ h2 {
   text-align: center;
   font-family: 'Artifika', serif;
 }
-#jmbo {
-  background: transparent
+#jmbo{
+  background: transparent;
 }
 
 #signUp {
@@ -33,6 +33,10 @@ h2 {
 
 #backgrnd {
   background: transparent;
+}
+
+#profileContainer {
+   background: transparent
 }
 
 
