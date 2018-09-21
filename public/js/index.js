@@ -61,6 +61,7 @@ var handleSaveUsr = function () {
     Friday: $("#timeInputFri").val(),
     Saturday: $("#timeInputSat").val()
   };
+  var password = $("password").val();
 
   console.log(username, zipcode, phonenumber, allTimes);
 
@@ -68,7 +69,7 @@ var handleSaveUsr = function () {
     type: "POST",
     data: JSON.stringify({
       name: "Must set",
-      password: "MustSet",
+      password: password,
       username: username,
       zipcode: zipcode,
       phoneNumber: phonenumber,
