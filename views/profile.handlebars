@@ -16,20 +16,22 @@
         <div class=" col-md-9 col-lg-9 ">
           <table class="table table-user-information" >
             <tbody>
+              {{!-- {{#if isUser}} --}}
               <tr>
-                <td><input name="user[name]" id="user" type="text" placeholder="Name" class="input pass" /> {{user.name}} </td>
+                <td><input name="user[name]" id="user" type="text" placeholder="User Name" value={{user.username}} class="input pass"/> </td>
               </tr>
               <tr>
-                <td><input name="user[zipcode]" id="zipcode" type="text" placeholder="Zipcode" class="input pass" /> {{user.zipcode}} </td>
+                <td><input name="user[zipcode]" id="zipcode" type="text" placeholder="ZipCode" value={{user.zipcode}} class="input pass"/>  </td>
               </tr>
               <tr>
-                <td><input name="user[phonenumer]" id="phoneNum" type="text" placeholder="Phone Number" class="input pass" /> {{user.phoneNumber}} </td>
+                <td><input name="user[phonenumber]" id="phoneNum" type="text" placeholder="Phone Number" value={{user.phoneNumber}} class="input pass" />  </td>
               </tr>
+              {{!-- {{/if}} --}}
             </tbody>
           </table>
         </div>
         <div class="col">
-          
+
         </div>
       </div>
       <div class="card-body">
