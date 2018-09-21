@@ -62,19 +62,11 @@ module.exports = function (app) {
     console.log("hit the get route /hourly with data: " + JSON.stringify(req.params.zipcode));
     // TODO - at this point get the hourly data from dark-sky by doing a get to the api route:
 
-    var req = http.request(process.env.BASE_URL + "/api/hourly/ + req.params.zipcode, response => {
-      response.on('data', (data) => {
-        console.log("got this data: " + data);
-      });
+    // app.get("/api/hourly/" + req.params.zipcode).then((response) => {
+    res.render("hourly", {
+      hourly: {}
+    });
+    // });
   });
-  // req.end();
-  res.render("hourly", {});
-
-  // app.get("/api/hourly/" + req.params.zipcode).then((response) => {
-  //   res.render("hourly", {
-  //     hourly: response
-  //   });
-  // });
-});
 
 };
