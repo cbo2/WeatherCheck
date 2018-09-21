@@ -2,6 +2,8 @@ var db = require("../models");
 var moment = require('moment');
 moment().format();
 var schedule = require('node-schedule');
+var passport = require("../config/passport");
+
 
 // zipcode longitude/latitude converter stuff start-----------------------------------------------------------------------------------
 var NodeGeocoder = require('node-geocoder');
@@ -351,8 +353,13 @@ module.exports = function (app) {
   app.post("/api/createuser", function (req, res) {
     console.log("*********************>>>>>>>>>>>>>>>   hit the post route for /api/createuser with body of: " + JSON.stringify(req.body));
     db.UserProfile.create(req.body).then(function (dbUserCreated) {
-      res.json(dbUserCreated);
+      res.redirect(307, "/profile");
+    }).catch(function(err) {
+      console.log(err);
+      res.json(err);
+      // res.status(422).json(err.errors[0].message);
     });
+
   });
 
   //Push Data into database
@@ -396,6 +403,14 @@ module.exports = function (app) {
   app.get("/api/hourly/:zipcode", function (req, res) {
     console.log("hit the get route /api/hourly with data: " + JSON.stringify(req.params.zipcode));
   
+  });
+
+  app.post("/api/userlogin", passport.authenticate("local"), function(req, res) {
+    console.log("hit /api/login post route with data: " + JSON.stringify(req.body));
+    // Since we're doing a POST with javascript, we can't actually redirect that post into a GET request
+    // So we're sending the user back the route to the members page because the redirect will happen on the front end
+    // They won't get this or even be able to access this page if they aren't authed
+    res.json("/profile/" + req.body.username);
   });
 
   // get a profile by id
