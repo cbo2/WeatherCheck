@@ -4,6 +4,45 @@ var $logIn = $("#log-in");
 var $newAcc = $("#newAcc");
 var $saveUsr = $("#saveUsr");
 
+var API = {
+  createNew: function (username, password) {
+    console.log("We are here")
+    return $.ajax("/api/createuser", {
+      contentType: "application/json",
+      data: JSON.stringify({
+        username: username,
+        password: password
+      }),
+      type: "POST"
+    });
+  },
+
+  logIn: function (username, password) {
+    console.log("Hello" + " " + username + " " + password);
+    return $.ajax({
+      url: "/api/userlogin/" + username,
+      data: {
+        username: username,
+        password: password
+      },
+      type: "GET",
+      success: function (result) {
+        console.log("This is the result:" + result);
+        console.log("This is the result:" + result);
+        $.ajax({
+          url: "/profile",
+          data: result,
+          type: "POST", 
+          success: function(){
+            console.log("This works!");
+            window.location.href = "/profile";
+          }
+        });
+      }
+    });
+  }
+};
+
 //functions for clicks to render proper page
 
 var handleSignUpClick = function () {
@@ -11,11 +50,22 @@ var handleSignUpClick = function () {
 };
 
 var handleSignInClick = function () {
-  $(this).attr("href", "/profile");
+  event.preventDefault();
+
+  var username = $("#usrName").val();
+  var password = $("#password").val();
+  API.logIn(username, password);
 };
 
-var handleCreateAcc = function () {
-  $(this).attr("href", "/profile");
+var handleCreateAcc = function (event) {
+  event.preventDefault();
+
+  var username = $("#userName").val();
+  var password = $("#password").val();
+
+  API.createNew(username, password).then(function () {
+    $(this).attr("href", "/profile");
+  });
 };
 
 var handleSaveUsr = function () {
@@ -31,7 +81,7 @@ var handleSaveUsr = function () {
     Friday: $("#timeInputFri").val(),
     Saturday: $("#timeInputSat").val()
   };
-  
+
   console.log(username, zipcode, phonenumber, allTimes);
 
   $.ajax("/api/profile", {
@@ -44,7 +94,7 @@ var handleSaveUsr = function () {
       phoneNumber: phonenumber,
       timePreference: allTimes
     }),
-    contentType:"application/json",
+    contentType: "application/json",
   }).then(function () {
     console.log("This User has been saved!");
     // location.reload();
