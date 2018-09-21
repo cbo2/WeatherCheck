@@ -360,14 +360,35 @@ module.exports = function (app) {
   })
 
   // Create a new profile or update an existing profile
+  // since these are combined, we need to handle the .create vs .update to sequelize
   app.post("/api/profile", function (req, res) {
     console.log("hit the post route /api/profile with body: " + JSON.stringify(req.body));
     console.log("Will get weather data in the database for this user: " + req.body.username + " with zipcode: " + req.body.zipcode);
     get5DaysWeatherInDB(req.body.zipcode);
     scheduleTaskForOneUser(req.body);
-    db.UserProfile.create(req.body).then(function (dbUser) {
-      res.json(dbUser);
+
+    db.UserProfile.findOne({ where: { username: req.body.username } }).then(function (foundItem) {
+      if (!foundItem) {
+        // Item not found, create a new one
+        db.UserProfile.create(req.body)
+          .then((dbUser) => {
+            res.json(dbUser);
+          }).catch((err) => {
+            console.log("ERROR while creating user: " + req.body.username + " " + err);
+          });
+      } else {
+        // Found an item, update it
+        db.UserProfile.update(req.body, { where: { username: req.body.username } })
+          .then((dbUser) => {
+            res.json(dbUser);
+          }).catch((err) => {
+            console.log("ERROR while updating user: " + req.body.username + " " + err);
+          });      }
     });
+
+    // db.UserProfile.create(req.body).then(function (dbUser) {
+    //   res.json(dbUser);
+    // });
   });
 
 
