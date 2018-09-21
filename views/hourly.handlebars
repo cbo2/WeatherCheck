@@ -1,0 +1,90 @@
+<div id="jmbo" class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4 center">Hourly Weahter Data For {{user.username}}</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card text-center" id="profileContainer">
+        <div class="card-header">
+            <h3 class="panel-title"></h3>
+
+            <div class="row">
+                <div class="col">
+
+                </div>
+                <div class=" col-md-9 col-lg-9 ">
+                    <table class="table table-user-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input name="user[name]" id="user" type="text" placeholder="User Name" value="{{user.username}}"
+                                        class="input pass" /> </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input name="user[zipcode]" id="zipcode" type="text" placeholder="ZipCode" value="{{user.zipcode}}"
+                                        class="input pass" /> </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input name="user[phonenumber]" id="phoneNum" type="text" placeholder="Phone Number" value="{{user.phoneNumber}}"
+                                        class="input pass" /> </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Hour</th>
+                                <th scope="col">High Temp</th>
+                                <th scope="col">Low Temp</th>
+                                <th scope="col">Wind</th>
+                                <th scope="col">Summary</th>
+                                <th scope="col">Icon</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Jacob</td>
+                                <td>Thornton</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@fat</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>Larry</td>
+                                <td>the Bird</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@mdo</td>
+                                <td>@twitter</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/js/index.js"></script>

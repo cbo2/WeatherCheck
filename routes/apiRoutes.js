@@ -383,7 +383,8 @@ module.exports = function (app) {
             res.json(dbUser);
           }).catch((err) => {
             console.log("ERROR while updating user: " + req.body.username + " " + err);
-          });      }
+          });
+      }
     });
 
     // db.UserProfile.create(req.body).then(function (dbUser) {
@@ -391,6 +392,11 @@ module.exports = function (app) {
     // });
   });
 
+  // get a profile by id
+  app.get("/api/hourly/:zipcode", function (req, res) {
+    console.log("hit the get route /api/hourly with data: " + JSON.stringify(req.params.zipcode));
+  
+  });
 
   // get a profile by id
   app.get("/api/userlogin/:username", function (req, res) {
