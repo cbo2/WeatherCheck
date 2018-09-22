@@ -57,7 +57,6 @@ var API = {
 function handleLoginErr(err) {
   console.log("we have an error: " + JSON.stringify(err));
   alert(err.status + ": " + err.responseText);
-  // $("#alert").fadeIn(500);
 }
 
 //functions for clicks to render proper page
