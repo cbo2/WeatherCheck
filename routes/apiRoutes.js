@@ -186,7 +186,7 @@ function wiseWeatherWords(username, zip) {
         wisdom += "No umbrella needed\n";
       }
     }
-    wisdom += process.env.BASE_URL + "/hourly/" + zip + "\n";
+    wisdom += process.env.BASE_URL + "hourly/" + zip + "\n";
     console.log("___----> wisdom is: " + wisdom);
     console.log("todays high: " + todayHigh + " and the average high: " + sumHighs / numRows);
     console.log("today's low: " + todayLow + " and the average low: " + sumLows / numRows);
