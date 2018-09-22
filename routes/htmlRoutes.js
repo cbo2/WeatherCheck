@@ -6,7 +6,7 @@ module.exports = function (app) {
     // db.weather.findAll({}).then(function(dbExamples) {
     res.render("index", {
       msg: "Weather Check✔️",
-      title: "Sign up for daily text messages for the weather of the day.",
+      title: "Sign up for daily out-the-door weather advise notifications",
       note: "Please log in if you have an account."
     });
     // });
