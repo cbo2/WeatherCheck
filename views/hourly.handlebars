@@ -1,6 +1,6 @@
 <div id="jmbo" class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4 center">Hourly Weahter Data For {{user.username}}</h1>
+        <h1 class="display-4 center">Hourly Weahter Data For {{zip}}</h1>
     </div>
 </div>
 
@@ -30,13 +30,12 @@
                             {{#each hourly}}
                             <tr>
                                 <th scope="row">{{@index}}</th>
-                                <td>{{this.temperature}}</td>
                                 <td>{{this.summary}}</td>
                                 <td>{{this.temperature}}</td>
                                 <td>{{this.humidity}}</td>
                                 <td>{{this.windSpeed}}</td>
                                 <td>{{this.windGust}}</td>
-                                <td>{{this.icon}}</td>
+                                <td><img src="/images/{{this.icon}}.png" style="width:25px;height:25px"></td>
                             </tr>
                             {{/each}}
                         </tbody>
