@@ -5,6 +5,8 @@ const DarkSky = require('dark-sky')
 const darksky = new DarkSky(process.env.DARK_SKY)
 var schedule = require('node-schedule');
 var passport = require("../config/passport");
+var twilio = require('twilio');
+require("dotenv").config();
 
 
 // zipcode longitude/latitude converter stuff start-----------------------------------------------------------------------------------
@@ -19,105 +21,17 @@ var options = {
 };
 var geocoder = NodeGeocoder(options);
 
-geocoder.geocode('60632', function (err, res) {
-  console.log("********************* GEOCODE Start **********************");
-  console.log("The latitude is: " + res[0].latitude);
-  console.log("The longitude is: " + res[0].longitude);
-  // console.log("baseurl: " + window.location.origin);
-  console.log("baseurl: " + process.env.BASE_URL);
-  console.log("********************* GEOCODE End **********************");
-});
-// zipcode longitude/latitude converter stuff end--------------------------------------------------------------------------------
-
 // Twilio Stuff------------------------------------------------------------------------------------------------------------------
-var twilio = require('twilio');
-require("dotenv").config();
-
 var sid = process.env.TWILIO_SID;
 var token = process.env.TWILIO_TOKEN;
-
-console.log("the sid is: " + sid);
-console.log("the token is: " + token);
-
-// db.UserProfile.create({
-//   username: "cbo",
-//   // timePreference: JSON.stringify({
-//   timePreference: {
-//     Sunday: "10:28",   // give the time as a simple string
-//     Monday: "10:53",
-//     Tuesday: moment.utc("00:03", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-//     Wednesday: "11:09",
-//     Thursday: "13:15",
-//     Friday: "01:43",
-//     Saturday: "09:30"
-//   },
-//   password: "password",
-//   name: "craig",
-//   phoneNumber: 6309955170,
-//   phone: 6309955170,
-//   zipcode: 60605
-// })
-//   .then((returnedFromSequelize) => {
-//     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-//     console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
-//     return returnedFromSequelize;
-//   })
-//   .then((priorInsertResponse) => {
-//     db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-//       .then((queryUser) => {
-//         // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-//         console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
-//       })
-//   })
-
-// db.UserProfile.create({
-//   username: "cbo2",
-//   // timePreference: JSON.stringify({
-//   timePreference: {
-//     Sunday: "10:28",   // give the time as a simple string
-//     Monday: "10:53",
-//     Tuesday: moment.utc("11:00", "HH:mm").format("HH:mm"),  // or give the time as a moment's time (same thing)
-//     Wednesday: "10:56",
-//     Thursday: "09:48",
-//     Friday: "06:30",
-//     Saturday: "09:30"
-//   },
-//   password: "password",
-//   name: "craig",
-//   phoneNumber: 6309955170,
-//   phone: 6309955170,
-//   zipcode: 90210
-// })
-//   .then((returnedFromSequelize) => {
-//     console.log("== inserted row in userrpofile with: " + returnedFromSequelize);
-//     console.log("** today is a " + moment().format("dddd"));  // use moment to determine what kind of day today is
-//     return returnedFromSequelize;
-//   })
-//   .then((priorInsertResponse) => {
-//     db.UserProfile.findOne({ where: { id: priorInsertResponse.id } })
-//       .then((queryUser) => {
-//         // console.log("---- User with name: " + queryUser.username + " has timepref on Wednesday of: " + JSON.parse(queryUser.timePreference).Wednesday);
-//         console.log("---- User with name: " + queryUser.username + " has timepref on Monday of: " + queryUser.timePreference.Monday);
-//       })
-//   })
-
-// Find your account sid and auth token in your Twilio account Console.
 var client = new twilio(sid, token);
-
-// Send the text message.
-client.messages.create({
-  to: '+16307915544',
-  from: '+16307915544',
-  body: "started running the node app at: " + moment().format() + " !!"
-}).then((message) => console.log(message.sid))
-  .catch(err => console.log(err));
 // end Twilio Stuff---------------------------------------------------------------------------------------------------------
 
 // This is the workhorse.  It will run a daily task at midnight and find all users in the database
 // For each user it will discover their preferred notification time and fire a task to send them weather info at that time
 // This function also needs to go to darksky and pull in the current day weather and put it into the db
 // and purge out any weather data older than 5 days
-var dailyTask = schedule.scheduleJob('42 * * * *', function () {
+var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
   console.log("**======================= DAILY TASK RUNNER running at: " + moment().format() + " ======================");
   var today = moment().format('dddd');
   purgeOldDataFromDB(today);
