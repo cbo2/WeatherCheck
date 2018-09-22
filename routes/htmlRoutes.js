@@ -51,17 +51,10 @@ module.exports = function (app) {
   app.post("/profile", function (req, res) {
     console.log("hit the post route /profile with data: " + JSON.stringify(req.body));
     db.UserProfile.findOne({ where: { username: req.body.username } }).then(function (userdata) {
-      if (req.body.password !== userdata.password) {
-        res.render("errorlogin", {
-          msg: "Wrong password!",
-          user: userdata
-        });
-      } else {
-        res.render("profile", {
-          msg: "Welcome ",
-          user: userdata
-        });
-      }
+      res.render("profile", {
+        msg: "Welcome ",
+        user: userdata
+      });
     });
   });
 
