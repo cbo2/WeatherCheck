@@ -11,6 +11,7 @@ Group Name is:  Dothraki
 * nodd-geocoder (Google API being used to convert user input of zipcode to longitude/latitude required by dark-sky weather API)
 * handlebars
 * Sequelize
+* passport authentication
 
 to run with overrides:
 NODE_ENV=development DB_PASSWORD=mypassword node server.js
