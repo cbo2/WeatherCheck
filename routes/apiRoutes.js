@@ -36,8 +36,6 @@ var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
   db.UserProfile.findAll({}).then((users) => {
     users.map((user) => {
       get5DaysWeatherInDB(user.zipcode);
-      console.log("the value of today is: " + today);
-      console.log("the value from the user for today is: " + user.timePreference[today]);
       try {
         var oneUserTask = scheduleTaskForOneUser(user);
       } catch (error) { console.log("*************** ERROR!!!! **********" + error); }
@@ -50,10 +48,8 @@ var dailyTask = schedule.scheduleJob('0 0 * * *', function () {
 function scheduleTaskForOneUser(user) {
   var today = moment().format('dddd');
   if (user.timePreference[today] === "") {
-    console.log("******* the value for user: " + user.username + " does not want a notification on: " + today + "!  None will be scheduled!!");
-    return;  // go to next user in uses.map() call
+    return;  // user doesn't want a notification today, go to next user in uses.map() call
   }
-  console.log("the value from the user for today is: " + user.timePreference[today]);
   var HHmmArray = user.timePreference[today].split(":");
   var scheduleDayTime = HHmmArray[1] + " " + HHmmArray[0] + " * * " + today.substring(0, 3);  // use substring to abbreviate the day to 3 chars
   console.log("will schedule task for user at: " + scheduleDayTime);
@@ -68,16 +64,11 @@ var userTask = function (username, phoneNumber, zipcode) {
     console.log("running for user id: " + username);
     // var weatherWisdom = wiseWeatherWords(username, zipcode).then(((wiz) => {
     wiseWeatherWords(username, zipcode).then((wiz) => {
-      console.log("==> Got the weather wisdom of: " + wiz);
-      // });
-      console.log("Got the weather wisdom of: " + wiz);
       client.messages.create({
         to: phoneNumber,
         from: '+16307915544', // Don't touch me!
         body: wiz
       });
-      console.log("I am running for user with phoneNumber: " + phoneNumber);
-      console.log("and will get weather information for this user using zipcode: " + zipcode);
     });
   }.bind(null, username, phoneNumber, zipcode);
 }
@@ -93,8 +84,6 @@ var userTask = function (username, phoneNumber, zipcode) {
 //    Generate a comment if it will be windy if wind speeds greatet than 15mph
 //    As a curtosy, generate a link that will show detailed hourly weather data
 function wiseWeatherWords(username, zip) {
-  console.log("running wiseWeatherWords for user id: " + username);
-
   var today = moment().format("YYYY-MM-DD");
   var priorDay = moment().subtract(1, 'days').format("YYYY-MM-DD");
   var numRows = 0;
@@ -165,10 +154,6 @@ function wiseWeatherWords(username, zip) {
       }
     }
     wisdom += process.env.BASE_URL + "hourly/" + zip + "\n";
-    console.log("___----> wisdom is: " + wisdom);
-    console.log("todays high: " + todayHigh + " and the average high: " + sumHighs / numRows);
-    console.log("today's low: " + todayLow + " and the average low: " + sumLows / numRows);
-    console.log("precip % today: " + todayPrecip);
     return wisdom;
   }).catch(console.log);
 }
@@ -215,7 +200,6 @@ function get5DaysWeatherInDB(zip) {
         .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
         .get()                          // execute your get request.
         .then((response) => {
-          console.log(">>>> the value of i is: " + i);
           db.WeatherData.create({
             date: moment.unix(response.daily.data[0].time).format("YYYY-MM-DD"),
             hightemp: response.daily.data[0].temperatureHigh,
@@ -263,8 +247,6 @@ function getHourlyWeather(zip) {
         .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
         .get()                          // execute your get request.
         .then((response) => {
-          console.log(">>>> hourly data is: " + JSON.stringify(response.hourly.data));
-
           hourlydata = response.hourly.data;  // this return will return it from the promise
           return hourlydata;
         })
@@ -299,7 +281,6 @@ module.exports = function (app) {
   // Create a new profile or update an existing profile
   // since these are combined, we need to handle the .create vs .update to sequelize
   app.post("/api/profile", function (req, res) {
-    console.log("hit the post route /api/profile with body: " + JSON.stringify(req.body));
     console.log("Will get weather data in the database for this user: " + req.body.username + " with zipcode: " + req.body.zipcode);
     get5DaysWeatherInDB(req.body.zipcode);
     scheduleTaskForOneUser(req.body);
@@ -332,7 +313,6 @@ module.exports = function (app) {
   // get a profile by id
   app.get("/api/hourly/:zipcode", function (req, res) {
     console.log("hit the get route /api/hourly with data: " + JSON.stringify(req.params.zipcode));
-
   });
 
   app.post("/api/userlogin", passport.authenticate("local"), function (req, res) {
@@ -347,7 +327,6 @@ module.exports = function (app) {
   app.get("/api/userlogin/:username", function (req, res) {
     console.log("hit the get route /api/userlogin with data: " + JSON.stringify(req.params.username));
     db.UserProfile.findOne({ where: { username: req.params.username } }).then(function (user) {
-      console.log(JSON.stringify(user));
       res.json(user);
     });
   });
@@ -356,8 +335,6 @@ module.exports = function (app) {
   // hourly weather details.  This route will convert the zip code, get the hourly weather details, 
   // then post the data up the browser with handlebars
   app.get("/hourly/:zipcode", function (req, res) {
-    console.log("hit the get route /hourly with data: " + JSON.stringify(req.params.zipcode));
-
     geocoder.geocode(req.params.zipcode, function (err, geoResp) {
       if (err) {
         console.log("ERROR going to geocoder!!!!!!!!!!");
@@ -376,8 +353,6 @@ module.exports = function (app) {
         .extendHourly(true)             // optional: extend, boolean, refer to API documentation.
         .get()                          // execute your get request.
         .then((response) => {
-          console.log(">>>> hourly data is: " + JSON.stringify(response.hourly.data));
-
           hourlydata = response.hourly.data;  // this return will return it from the promise
           return hourlydata;
         })
