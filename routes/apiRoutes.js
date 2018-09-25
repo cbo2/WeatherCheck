@@ -8,6 +8,12 @@ var passport = require("../config/passport");
 var twilio = require('twilio');
 require("dotenv").config();
 
+// keep app alive on heroku -- since heroku sleeps all apps with 1 hour of inactivity!
+var http = require("http");
+setInterval(function() {
+    http.get(process.env.BASE_URL);
+}, 300000); // every 5 minutes (300000)
+
 
 // zipcode longitude/latitude converter stuff start----------------------------------------------------
 var NodeGeocoder = require('node-geocoder');
