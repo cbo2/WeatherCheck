@@ -1,6 +1,8 @@
 # Project Weather✔️
 
-Group Name is:  Dothraki
+This application will allow a user to log in and set up a profile which would include registering their phone number and zipcode.  Based on profile preferences the user will then get weather wisdom words of the day sent as a text at the time of their choosing.  The weather information will generate a weather pattern to establish a baseline and then issue suggestions as to prepare for the day's weather.  It is intended to be used as an out-the-door prep for the day's weather.  
+
+This is a multi-user application and as such it is designed to generate these out-the-door text messages for all users of the system on the time of each user's choosing.  This app will use a cron-like function to schedule delivery of the text messages and will use Twilio to send the message.  
 
 ## Technologies used
 * NodeJS
