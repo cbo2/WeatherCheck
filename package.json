@@ -18,7 +18,7 @@
     "body-parser": "^1.18.3",
     "dark-sky": "^1.1.4",
     "dotenv": "^6.0.0",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "express-handlebars": "^3.1.0",
     "moment": "^2.22.2",
     "mysql2": "^1.5.3",
